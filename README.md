@@ -1,8 +1,8 @@
-# pytorch_ehr
+# Pytorch_ehr
 
-Predictive analytics on EHR cerner data using pytorch library;
-Models built: baseline Logistic Regression, CNN, RNN; 
-The framework has modularized components for models, data loading, and training.
+* Predictive analytics on EHR cerner data using pytorch library;
+* Models built: baseline Logistic Regression, CNN, RNN; 
+* The framework has modularized components for models, data loading, and training.
 
 ## Getting Started
 
@@ -13,12 +13,12 @@ Something something I don't know what to put here yet. place holder place holder
 pytorch library, installation instructions could be found at <http://pytorch.org/> 
 
 
-## Running the tests
+## Running the Tests
 
 You could run test on the sample data using test.sh in the test folder.
 
 
-### some test results
+(some test results)
 
 
 ## Contributing
