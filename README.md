@@ -2,7 +2,8 @@
 
 * Predictive analytics on EHR cerner data using pytorch library;
 * Models built: baseline Logistic Regression, CNN, dialated CNN, RNN, Bidirectional RNN, Dialated RNN, TCN, WaveNet; 
-* The framework has modularized components for models, data loading, and training;
+* The framework has modularized components for models, data loading and processing, and training;
+* Bayesian Optimization implemented for hyperparameter search for all models; 
 * Data used: Cerner, with 15815 unique medical codes.
 
 ## Getting Started
