@@ -1,18 +1,19 @@
 # Pytorch_ehr
 
 * Predictive analytics on EHR cerner data using pytorch library;
-* Models built: baseline Logistic Regression, CNN, dialated CNN, RNN, Bidirectional RNN, Dialated RNN, TCN, WaveNet; 
-* The framework has modularized components for models, data loading and processing, and training;
-* Bayesian Optimization implemented for hyperparameter search for all models; 
-* Data used: Cerner, with 15815 unique medical codes.
+* Models built: baseline Logistic Regression with embedding dimension 1 and 2, CNN with 1 group and 2 groups, dialated CNN, RNN, Bidirectional RNN, Dialated RNN, TCN, WaveNet; 
+* The framework has modularized components for models, data loading and processing, and training, validation and test;
+* Bayesian Optimization implemented for hyperparameters search for models; 
+* Data used: Cerner, with 15815 unique medical codes. Test on 1 hospital
 
 ## Getting Started
 
-Something something I don't know what to put here yet. place holder place holder 
+place holder place holder 
 
-### Prerequisites
+## Prerequisites
 
-pytorch library, installation instructions could be found at <http://pytorch.org/> 
+Pytorch library, installation instructions could be found at <http://pytorch.org/> 
+Bayesian Optimization package at github repo: <https://github.com/fmfn/BayesianOptimization>
 
 
 ## Running the Tests
@@ -22,10 +23,6 @@ You could run test on the sample data using test.sh in the test folder.
 
 (some test results)
 
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 
