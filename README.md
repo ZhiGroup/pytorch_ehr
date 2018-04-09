@@ -4,7 +4,7 @@
 * Models built: baseline Logistic Regression with embedding dimension 1 and 2, CNN with 1 group and 2 groups, dialated CNN, RNN, Bidirectional RNN, Dialated RNN, TCN, WaveNet; 
 * The framework has modularized components for models, data loading and processing, and training, validation and test;
 * Bayesian Optimization implemented for hyperparameters search for models; 
-* Data used: Cerner, with 15815 unique medical codes. Test on 1 hospital
+* Data used: Cerner, with 15815 unique medical codes. 
 
 ## Getting Started
 
