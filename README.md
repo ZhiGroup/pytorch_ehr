@@ -4,7 +4,7 @@
 * Models built: Logistic Regression with embedding dimension 1 and 2, Vanilla RNN, RNN with GRU, RNN with LSTM, Bidirectional RNN, Dialated RNN; 
 * The framework has modularized components for models, data loading and processing, and training, validation and test, main file for parsing arguments;
 * Bayesian Optimization implemented for hyperparameters search for models, both locally using open source BayesianOptimization package and SigOpt software; 
-* Other experiments for visualizations, 
+* Other experiments include visualizations, larger datasets with separate tests for longer and shorter visits;
 * Data used: Cerner, with 15815 unique medical codes. 
 
 ## Getting Started
