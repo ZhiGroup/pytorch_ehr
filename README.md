@@ -1,9 +1,10 @@
 # Pytorch_ehr
 
-* Predictive analytics on EHR cerner data using pytorch library;
-* Models built: baseline Logistic Regression with embedding dimension 1 and 2, Vanilla RNN, RNN with GRU, RNN with LSTM, Bidirectional RNN, Dialated RNN; 
-* The framework has modularized components for models, data loading and processing, and training, validation and test;
+* Predictive analytics on EHR cerner data using Pytorch library;
+* Models built: Logistic Regression with embedding dimension 1 and 2, Vanilla RNN, RNN with GRU, RNN with LSTM, Bidirectional RNN, Dialated RNN; 
+* The framework has modularized components for models, data loading and processing, and training, validation and test, main file for parsing arguments;
 * Bayesian Optimization implemented for hyperparameters search for models, both locally using open source BayesianOptimization package and SigOpt software; 
+* Other experiments for visualizations, 
 * Data used: Cerner, with 15815 unique medical codes. 
 
 ## Getting Started
