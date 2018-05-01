@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-#latest codes for LR as well as RNN from Laila 
-#for 1D LR, you can either:
-#1.change the the dimension, and comment parts where 2D embedding matrix is specified,
-#2.or directly use the EHR_LR1() object:the variation of model 1 is as below
+#latest codes for LR Dim2 as well as RNN from Laila 
+#for 2D LR: extracting embedded matrix by default; return output, real_label tensor and embeded. 
+#for 1D LR: modify embed_dim to 1 
 import numpy as np 
 import torch
 import torch.nn as nn
@@ -25,25 +24,6 @@ class EHR_LR(nn.Module):
         self.sigmoid = nn.Sigmoid()
         #extracting initial weights, can be commentted out if not desired
         self.x_emb_m = self.embedding.weight
-        print(self.x_emb_m)
-        z=self.x_emb_m.cpu().data.numpy()
-        #combine each medical code to corresponding 'human language'
-        emb_types = pickle.load(open('Data/h143.types', 'rb'),encoding='bytes')
-        print(len(emb_types))
-        sorted_t = OrderedDict(sorted(emb_types.items(), key=lambda x: x[1]))
-        types =[]
-        for k, v in sorted_t.items():
-            types.append(k)
-        types= ['Code']+types+['Code']*4184 #filling the embedding matrix with 'code' type when non-existent in types;
-        test = pd.DataFrame(z)
-        test['types'] = types
-        test.columns = ['emb_0','emb_1','types']
-        #print(test.head())
-        test.to_csv('embedding_out_dim2', sep='\t')
-        plt.figure()
-        plt.scatter(z[:,0],z[0:,1], alpha = 0.5)
-        plt.title('Initial embedding matrix')
-        plt.show()
         
     def forward(self, input):  #lets say the input the one sample data of the merged set  
         label, ehr_seq = input[0] 
@@ -58,54 +38,6 @@ class EHR_LR(nn.Module):
         embedded = torch.sum(embedded, dim=0).view(1,-1)
         output = self.sigmoid(self.out(embedded))
         return output, label_tensor,embedded #return output and also label tensor
-    
-#model1 variation: embed_dim =1     
-class EHR_LR1(nn.Module):
-    def __init__(self,input_size, embed_dim = 1):    
-        super(EHR_LR1, self).__init__()
-    
-        
-        self.embed_dim = embed_dim
-        self.embedding = nn.Embedding(input_size,embed_dim)
-        self.out = nn.Linear(self.embed_dim,1)
-        self.sigmoid = nn.Sigmoid()
-        self.x_emb_m = self.embedding.weight
-        print(self.x_emb_m)
-        z=self.x_emb_m.cpu().data.numpy()
-        emb_types = pickle.load(open('Data/h143.types', 'rb'),encoding='bytes')
-        #print(len(emb_types))
-        sorted_t = OrderedDict(sorted(emb_types.items(), key=lambda x: x[1]))
-        types =[]
-        for k, v in sorted_t.items():
-            #print(k,v)
-            types.append(k)
-        types= ['Code']+types+['Code']*4184 #filling the embedding matrix with 'code' type when non-existent in types;
-        #print(types)
-        #len(types)
-        test = pd.DataFrame(z)
-        test['types'] = types
-        test.columns = ['emb','types']
-        print(test.head())
-        test.to_csv('embedding_out_dim1', sep='\t')
-
-        
-    def forward(self, input):  #lets say the input the one sample data of the merged set  
-        label, ehr_seq = input[0] 
-        #print(input[0]) 
-        label_tensor = Variable(torch.FloatTensor([[float(label)]]))
-        if use_cuda:
-            label_tensor = label_tensor.cuda()
-        if use_cuda:
-            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])).cuda() 
-        else:
-            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])) 
-        embedded = self.embedding(result).view(-1, self.embed_dim) #modified, instead of (-1,1, self.hidden_size) => use (-1,self.hidden_size)
-        embedded = torch.sum(embedded, dim=0).view(1,-1)#modified,instead of (1,1,-1) => use .view(1,-1) 
-        output = self.sigmoid(self.out(embedded))
-        #print(embedded)
-        return output, label_tensor,embedded #return output and also label tensor 
-
-    
 
 
 # Model 2:RNN     
