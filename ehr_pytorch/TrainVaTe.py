@@ -79,7 +79,7 @@ def calculate_auc(model, data, which_model, batch_size=1):  #this part is for 2D
     n_batches = int(np.ceil(int(len(data)) / int(batch_size))) #for getting results without visualization, comment out embedding related
     y_real =[]
     y_hat= []
-    emb= np.array([[999.,999.]]) #placeholder
+    emb= np.array([[999.,999.]]) # for 2D, comment out or modify for 1D accordingly fro 1D LR
     for index in range(n_batches):
             batch = data[index*batch_size:(index+1)*batch_size]
             output, label_tensor, em = model(batch)
