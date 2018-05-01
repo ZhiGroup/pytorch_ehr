@@ -7,10 +7,6 @@
 * Other experiments include visualizations, larger datasets with separate tests for longer and shorter visits;
 * Data used: Cerner, with 15815 unique medical codes. 
 
-## Getting Started
-
-place holder place holder 
-
 ## Prerequisites
 
 * Pytorch library, installation instructions could be found at <http://pytorch.org/> 
