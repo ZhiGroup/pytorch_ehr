@@ -142,6 +142,7 @@ for ep in range(args.epochs):
     print2file(pFile, logFile)    
     
     """
+    #compared to what we used to do:
     train_auc, y_real, y_hat, _ = TVT.calculate_auc(model= ehr_model, data = train1, which_model = args.which_model, batch_size = args.batch_size)
     TrainVaTe.auc_plot(y_real, y_hat)
     valid_auc, y_real, y_hat, _  = TVT.calculate_auc(model = ehr_model, data = valid1, which_model = args.which_model, batch_size = args.batch_size)
