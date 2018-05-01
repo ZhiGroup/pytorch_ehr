@@ -13,9 +13,9 @@ place holder place holder
 
 ## Prerequisites
 
-Pytorch library, installation instructions could be found at <http://pytorch.org/> 
-Bayesian Optimization package at github repo: <https://github.com/fmfn/BayesianOptimization>
-SigOpt software: <https://sigopt.com/> 
+* Pytorch library, installation instructions could be found at <http://pytorch.org/> 
+* Bayesian Optimization package at github repo: <https://github.com/fmfn/BayesianOptimization>
+* SigOpt software: <https://sigopt.com/> 
 
 ## Authors
 
