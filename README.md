@@ -1,6 +1,6 @@
 # Pytorch_ehr
 
-* Predictive analytics on EHR cerner data using Pytorch library;
+* Predictive analytics of heart failture onset risk on EHR cerner data using Pytorch library;
 * Models built: Logistic Regression with embedding dimension 1 and 2, Vanilla RNN, RNN with GRU, RNN with LSTM, Bidirectional RNN, Dialated RNN; 
 * The framework has modularized components for models, data loading and processing, and training, validation and test, main file for parsing arguments;
 * Bayesian Optimization implemented for hyperparameters search for models, both locally using open source BayesianOptimization package and SigOpt software; 
