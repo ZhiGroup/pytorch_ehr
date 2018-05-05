@@ -3,6 +3,7 @@
 #latest codes for LR Dim2 as well as RNN from Laila 
 #for 2D LR: extracting embedded matrix by default; return output, real_label tensor and embeded. 
 #for 1D LR: modify embed_dim to 1 
+#variation for dim128 that takes in pretrained embeddings are also included 
 import numpy as np 
 import torch
 import torch.nn as nn
@@ -39,6 +40,46 @@ class EHR_LR(nn.Module):
         output = self.sigmoid(self.out(embedded))
         return output, label_tensor,embedded #return output and also label tensor
 
+# Model 1 variation: LR(dimension = 128) that takes in pretrained embeddings     
+class EHR_LR_pretr(nn.Module):
+    def __init__(self,input_size, embed_dim= 128, preTrainEmb=False):    
+        super(EHR_LR_pretr, self).__init__()
+    
+        self.embed_dim = embed_dim
+        #self.embedding = nn.Embedding(input_size,embed_dim)
+        self.out = nn.Linear(self.embed_dim,1)
+        self.sigmoid = nn.Sigmoid()
+        self.preTrainEmb=preTrainEmb
+        #Need to modify here 
+        if self.preTrainEmb:
+           self.embed_dim = emb_t.size(1)
+           input_size = emb_t.size(0)
+           self.embedding = nn.EmbeddingBag(emb_t.size(0),emb_t.size(1))#,mode= 'sum')
+           self.embedding.weight.data= emb_t
+           self.embedding.weight.requires_grad=False
+         
+        else:
+           self.embedding = nn.Embedding(input_size, self.embed_dim) #mode= 'sum')
+        
+
+    def forward(self, input):  #lets say the input the one sample data of the merged set  
+        label, ehr_seq = input[0] 
+        #print(input[0]) 
+        label_tensor = Variable(torch.FloatTensor([[float(label)]]))
+        if use_cuda:
+            label_tensor = label_tensor.cuda()
+        if use_cuda:
+            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])).cuda() 
+        else:
+            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])) 
+        embedded = self.embedding(result).view(-1, self.embed_dim) #modified, instead of (-1,1, self.hidden_size) => use (-1,self.hidden_size)
+        embedded = torch.sum(embedded, dim=0).view(1,-1)#modified,instead of (1,1,-1) => use .view(1,-1) 
+        output = self.sigmoid(self.out(embedded))
+        
+        return output, label_tensor #return output and also label tensor 
+    
+    
+    
 
 # Model 2:RNN     
 class EHR_RNN(nn.Module):
@@ -318,94 +359,3 @@ class DRNN(nn.Module):
             return c
             
             
-#Model 3: CNN_EHR            
-
-class CNN_EHR(nn.Module):
-   
-    def __init__ (self, input_size, embed_dim, ch_out, kernel_size=2, dropout=0 , dilation_depth=1 , cnn_grp=1 ):
-        
-        # model.CNN_EHR(args.input_size, args.embed_dim, args.ch_out, args.k_size, args.dropout, args.n_layers) 
-        # for Dilated CNN , n_layers represent the dilation depth use the ch_out=emb_dim
-        # for depthwise CNN , use ch_out = embed_dim*kernel_size, groups= embed_dim)
-        super(CNN_EHR, self).__init__()
-        
-        self.P = input_size ## number of predictors in our model
-        self.D  = embed_dim
-        self.K = kernel_size 
-        self.dilations = [self.K**i for i in range(dilation_depth)] 
-        self.cnn_grp = cnn_grp
-        C = 1
-        Ci = 1
-        self.Co = ch_out
-
-        self.embedBag = nn.EmbeddingBag(self.P , self.D,mode= 'sum') 
-        self.convs = nn.ModuleList([])
-        for d in self.dilations:
-          if d==1:
-              conv= nn.Conv1d(in_channels=self.D, out_channels=self.Co, kernel_size=self.K, dilation=d , padding = d , groups= self.cnn_grp )
-          else: 
-              conv= nn.Conv1d(in_channels=self.Co, out_channels=self.Co, kernel_size=self.K, dilation=d , padding = d , groups= self.cnn_grp )
-              
-          self.convs.append(conv)
-          
-        self.dropout = nn.Dropout(dropout)
-        self.fc1 = nn.Linear(self.Co, C)
-        self.sigmoid = nn.Sigmoid()
-   
-    def EmbedPatient_MB(self, seq_mini_batch): # x is a ehr_seq_tensor
-        
-       
-        lp= len(max(seq_mini_batch, key=lambda xmb: len(xmb[1]))[1]) 
-        tb= torch.FloatTensor(len(seq_mini_batch),lp,self.D) 
-        lbt1= torch.FloatTensor(len(seq_mini_batch),1)
-
-        for pt in range(len(seq_mini_batch)):
-              
-            lbt ,pt_visits =seq_mini_batch[pt]
-            lbt1[pt] = torch.FloatTensor([[float(lbt)]])
-            ml=(len(max(pt_visits, key=len))) ## getting the visit with max no. of codes ##the max number of visits for pts within the minibatch
-            txs= torch.LongTensor(len(pt_visits),ml)
-            
-            b=0
-            for i in pt_visits:
-                pd=(0, ml-len(i))
-                txs[b] = F.pad(torch.from_numpy(np.asarray(i)).view(1,-1),pd,"constant", 0).data
-                b=b+1
-            
-            if use_cuda:
-                txs=txs.cuda()
-                
-            emb_bp= self.embedBag(Variable(txs)) ### embed will be num_of_visits*max_num_codes*embed_dim 
-            #### the embed Bag dim will be num_of_visits*embed_dim
-            
-            zp= nn.ZeroPad2d((0,0,0,(lp-len(pt_visits))))
-            xzp= zp(emb_bp)
-            tb[pt]=xzp.data
-
-        tb= tb.permute(1, 0, 2) ### as my final input need to be seq_len x batch_size x input_size
-        emb_m=Variable(tb)
-        label_tensor = Variable(lbt1)
-
-        if use_cuda:
-                label_tensor = label_tensor.cuda()
-                emb_m = emb_m.cuda()
-                
-        return emb_m , label_tensor
-
-
-    def forward(self, input):
-        #x = self.EmbedPatient(input) # [seqlen*batchsize*embdim]
-
-        x , lt = self.EmbedPatient_MB(input)
-        x = x.permute(1,2,0) # [N, Co, W]
-        
-        for conv in self.convs:
-            x = conv(x)
-        x = F.relu(x)  # [(N, Co, W), ...]*len(Ks)
-        x = F.max_pool1d(x, x.size(2)).squeeze(2) 
-        x = self.dropout(x)  # (N, len(Ks)*Co)
-        logit = self.fc1(x)  # (N, C)
-        y = self.sigmoid(logit)
-        
-
-        return y , lt
