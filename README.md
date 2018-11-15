@@ -62,7 +62,7 @@ python main.py  --root_dire<your folder that contains data file>  --file <filena
 ## Authors
 
 * See the list of [contributors]( https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
-* For development related requests [Contact](https://github.com/chocolocked)
+* For development related requests [Contact chocolocked](https://github.com/chocolocked)
 
 ## Acknowledgements
 
