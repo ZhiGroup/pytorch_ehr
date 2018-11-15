@@ -18,14 +18,14 @@
 
 
 **Data Description**
-Cerner, with 15815 unique medical codes. Full cohort with >1,000,000 records 
+* Cerner, with 15815 unique medical codes. Full cohort with >1,000,000 records 
 format: pickled multil-level lists. From most outmost to gradually inside:  Outmost level: 2nd level:  3rd level: 4th level:  5th level 
 code types & what they stand for: ?
 some visuals of the what the data looks like: my print out tables) 
 in the format of xx xx and xx 
 format: 
 code types & what they stand for: 
-some visuals of the what the data looks like: 
+some visuals of the what the data looks like
 
 **Paper Reference**
 * The [paper]() upon which this repo was built. (include paper link)
@@ -55,15 +55,14 @@ for i, batch in enumerate(loader):
 
 * To run our models, use:
 <pre>
-<<<<<<< HEAD
 python main.py  --root_dire<your folder that contains data file>  --file <filename> --which_model <'RNN'>  --optimizer<'adam'>....
 </pre>
 
 
 ## Authors
 
-See the list of [contributors]( https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
-For development related requests [Contact](https://github.com/chocolocked)
+* See the list of [contributors]( https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
+* For development related requests [Contact](https://github.com/chocolocked)
 
 ## Acknowledgements
 
