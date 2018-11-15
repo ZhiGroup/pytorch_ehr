@@ -2,18 +2,10 @@
 ***************** 
 
 **Overview**
-<<<<<<< HEAD
 * Predictive analytics of risk onset on Cerner Electronic Health Records(EHR) using Pytorch library;
 * Cerner EHR: 15815 unique medical codes. Full cohort with >1,000,000 records. Detailed info see  **Data Description** section below.
 * Models built: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest;
-=======
-* Predictive analytics of risk onset on EHR cerner data using Pytorch library;
-* Data description: Cerner, with 15815 unique medical codes. Full cohort with >1,000,000 records.
-format: 
-code types & what they stand for: 
-some visuals of the what the data looks like: 
-* Models built: Vanilla RNN, RNN with GRU, RNN with LSTM, Bidirectional RNN, Dialated RNN, QRNN, T-LSTM, GRU-Logistic Regression, plain LR, LR with embedding, Random Forest;
->>>>>>> a1f0356004223ad5c53cc8e8db48fca50e9dc0bd
+
 
 **Folder Organization**
 * ehr_pytorch: main folder with modularized components for all models, data loading and processing, and training, validation and test of models, main file for parsing arguments, and a EHRDataloader;
@@ -23,7 +15,7 @@ some visuals of the what the data looks like:
 * Test: coming up soon. Shell commands to quickly test on our package functionalities
 * Sphinx build documentations
 * Sample results:(? keep or discard? prob discard) 
-<<<<<<< HEAD
+
 
 **Data Description**
 Cerner, with 15815 unique medical codes. Full cohort with >1,000,000 records 
@@ -36,16 +28,6 @@ code types & what they stand for:
 some visuals of the what the data looks like: 
 
 **Paper Reference**
-=======
-* Heart Failure   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Readmission
-  <p float= "left">
-       <img src="SampleResults/HF.png" alt="Heart Failure" alt="List screen" title="List screen" height = "330" width="270" />
-       <img src="SampleResults/Readm.png" alt="Readmission" height = "330" width="270" />
-  </p>
-  <p float="left">
-        <img src="SampleResults/comparision.png" alt="Comparision" width="540" />
-  </p>
->>>>>>> a1f0356004223ad5c53cc8e8db48fca50e9dc0bd
 * The [paper]() upon which this repo was built. (include paper link)
 
 
@@ -56,18 +38,11 @@ some visuals of the what the data looks like:
 
 ## Tests
 
-<<<<<<< HEAD
+
 * To try our dataloader, use:
 <pre>
 data = EHRdataFromPickles(root_dir = '../data/', 
                                       file = 'hf.train')
-=======
-
-* To try our dataloader, use:
-<pre>
-data = EHRdataFromPickles(root_dir = '/data/projects/py_ehr_2/Data/', 
-                                      file = 'hf50_cl2_h143_ref_t1.train')
->>>>>>> a1f0356004223ad5c53cc8e8db48fca50e9dc0bd
 loader =  EHRdataLoader(data)
 #if you want to shuffle batches before using them 
 loader = iter_batch2(loader = loader, len(loader))
@@ -82,9 +57,6 @@ for i, batch in enumerate(loader):
 <pre>
 <<<<<<< HEAD
 python main.py  --root_dire<your folder that contains data file>  --file <filename> --which_model <'RNN'>  --optimizer<'adam'>....
-=======
-python main.py -file ... 
->>>>>>> a1f0356004223ad5c53cc8e8db48fca50e9dc0bd
 </pre>
 
 
