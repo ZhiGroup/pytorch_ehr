@@ -44,10 +44,10 @@ some visuals of the what the data looks like
 data = EHRdataFromPickles(root_dir = '../data/', 
                                       file = 'hf.train')
 loader =  EHRdataLoader(data)
-#if you want to shuffle batches before using them 
+
+#if you want to shuffle batches before using them, add this line 
 loader = iter_batch2(loader = loader, len(loader))
-for i, batch in enumerate(loader): 
-    #feed the batch to do things 
+
 #otherwise, directly call 
 for i, batch in enumerate(loader): 
     #feed the batch to do things
