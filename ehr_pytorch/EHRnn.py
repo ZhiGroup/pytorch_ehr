@@ -119,7 +119,10 @@ class EHRnnModule(nn.Module):
     
             ehr_seq_t= Variable(torch.stack(ehr_seq_tl,0)) 
             lpp= lp-lpx ## diff be max seq in minibatch and cnt of pt visits
-            zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise
+            if self.bi == 2:
+                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise. MODIFIED HERE
+            else:
+                zp= nn.ZeroPad2d((0,0,lpp,0))
             ehr_seq_t= zp(ehr_seq_t) ## zero pad the visits med codes
             mb.append(ehr_seq_t)
             if self.time:
