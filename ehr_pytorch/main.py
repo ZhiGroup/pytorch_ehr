@@ -42,11 +42,10 @@ import models as model
 from EHRDataloader import EHRdataFromPickles, EHRdataloader  #do modifications later
 import utils as ut #:)))) 
 #from embedding import EHRembeddings
-from EHRnn import EHRnnModule
+from EHREmb import EHREmbeddings
 
 #silly ones
 from termcolor import colored
-from logging import FileHandler
 
 # check GPU availability
 use_cuda = torch.cuda.is_available()
@@ -113,7 +112,7 @@ def main():
                               valid_ratio = args.valid_ratio) #prevent shuffle before splitting
     #see an example
     #can comment out 
-    print(data.__getitem__(35, seeDescription = True)) #get a smaller one please 
+    print(data.__getitem__(40, seeDescription = True)) #get a smaller one please 
     
     # Dataloader splits
     train, test, valid = data.__splitdata__() #this time, sort is true

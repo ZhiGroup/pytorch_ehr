@@ -16,24 +16,24 @@ import torch.nn.functional as F
 
 ##### modify the name of module accordingly
 #from embedding import EHRembeddings 
-from EHRnn import EHRnnModule
+from EHREmb import EHREmbeddings
 
 use_cuda = torch.cuda.is_available()
 ##################TO DO: cell-type cleanup!
 #### For DRNN & QRNN: should always override self.bi ==1 (ASK)
 
 # Model 1:RNN & Variations: GRU, LSTM, Bi-RNN, Bi-GRU, Bi-LSTM
-class EHR_RNN(EHRnnModule):
+class EHR_RNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU',bii=False ,time=False, preTrainEmb=''):
-        EHRnnModule.__init__(self,input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU', bii=False, time=False , preTrainEmb='')
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU', bii=False, time=False , preTrainEmb='')
 
 
     #embedding function goes here 
     def EmbedPatient_MB(self, input):
-        return EHRnnModule.EmbedPatients_MB(self, input)
+        return EHREmbeddings.EmbedPatients_MB(self, input)
     
     def EmbedPatient_SMB(self, input):
-        return EHRnnModule.EmbedPatients_SMB(self, input)       
+        return EHREmbeddings.EmbedPatients_SMB(self, input)       
      
     def init_hidden(self):
         
@@ -65,9 +65,9 @@ class EHR_RNN(EHRnnModule):
 
 
 #Model 2: DRNN, DGRU, DLSTM
-class EHR_DRNN(EHRnnModule): 
+class EHR_DRNN(EHREmbeddings): 
     def __init__(self,input_size,embed_dim, hidden_size, n_layers, dropout_r=0.1,cell_type='GRU', bii=False, time=False, preTrainEmb=''):
-        EHRnnModule.__init__(self,input_size, embed_dim ,hidden_size, n_layers ,dropout_r=0.1,cell_type='GRU', time=False , preTrainEmb='')
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers ,dropout_r=0.1,cell_type='GRU', time=False , preTrainEmb='')
         #super(DRNN, self).__init__()
         #The additional parameters that norma RNNs don't have
 
@@ -88,13 +88,10 @@ class EHR_DRNN(EHRnnModule):
         #self.out = nn.Linear(hidden_size,1)
 
     def EmbedPatient_MB(self, input):
-        return EHRnnModule.EmbedPatients_MB(self,input)
+        return EHREmbeddings.EmbedPatients_MB(self,input)
     
     def EmbedPatient_SMB(self, input):
-        return EHRnnModule.EmbedPatients_SMB(self,input)    
-        
-    #def drnn_layer(self, cell, inputs, rate, hidden=None):
-        #return EHRembeddings.drnn_layer(self, cell, inputs, rate, hidden=None) 
+        return EHREmbeddings.EmbedPatients_SMB(self,input)    
     
     def forward(self, inputs, hidden=None):
         if self.multi_emb: 
@@ -106,20 +103,114 @@ class EHR_DRNN(EHRnnModule):
         outputs = []
         for i, (cell, dilation) in enumerate(zip(self.cells, self.dilations)):
             if hidden is None:
-                x,_ = EHRnnModule.drnn_layer(self, cell, x, dilation) ############## WE HAVE THE DRNN LAYER HERE. LET"S TRY THINGS. IN THE SAME CLASS WE DEFINE EHREMBEDDINGD
+                x,_ = self.drnn_layer(cell, x, dilation) ############## WE HAVE THE DRNN LAYER HERE. LET"S TRY THINGS. IN THE SAME CLASS WE DEFINE EHREMBEDDINGD
             else:
-                x,hidden[i] = EHRnnModule.drnn_layer(self, cell, x, dilation, hidden[i]) #######DRNN_LAYER YAAAAAAAAAAA
+                x,hidden[i] = self.drnn_layer(cell, x, dilation, hidden[i]) #######DRNN_LAYER YAAAAAAAAAAA
             
         outputs=x[-dilation:]
         x=self.sigmoid(self.out(torch.sum(outputs,0))) #change from F to self.sigmoid, should be the same
         return x.squeeze(), lt.squeeze()
 
+        
+######Dilated RNN related methods
+    def drnn_layer(self, cell, inputs, rate, hidden=None):
+
+        #n_steps = len(inputs)
+        n_steps = inputs.size(0)
+        #print('n_steps',n_steps) 
+        #batch_size = inputs[0].size(0)
+        batch_size = inputs.size(1)
+        #print('batch size',batch_size) --verified correct
+        hidden_size = cell.hidden_size
+        #print('hidden size',hidden_size) --verified correct
+
+        inputs, dilated_steps = self._pad_inputs(inputs, n_steps, rate)
+        dilated_inputs = self._prepare_inputs(inputs, rate)
+
+        if hidden is None:
+            dilated_outputs, hidden = self._apply_cell(dilated_inputs, cell, batch_size, rate, hidden_size)
+        else:
+            hidden = self._prepare_inputs(hidden, rate)
+            dilated_outputs, hidden = self._apply_cell(dilated_inputs, cell, batch_size, rate, hidden_size, hidden=hidden)
+
+        splitted_outputs = self._split_outputs(dilated_outputs, rate)
+        outputs = self._unpad_outputs(splitted_outputs, n_steps)
+
+        return outputs, hidden
+       
+    def _apply_cell(self, dilated_inputs, cell, batch_size, rate, hidden_size, hidden=None):
+
+        if hidden is None:
+            if self.cell_type == 'LSTM':
+                c, m = self.init_hidden(batch_size * rate, hidden_size)
+                hidden = (c.unsqueeze(0), m.unsqueeze(0))
+            else:
+                hidden = self.init_hidden(batch_size * rate, hidden_size).unsqueeze(0)
+
+        dilated_outputs, hidden = cell(dilated_inputs, hidden)
+
+        return dilated_outputs, hidden
+
+    def _unpad_outputs(self, splitted_outputs, n_steps):
+
+        return splitted_outputs[:n_steps]
+
+    def _split_outputs(self, dilated_outputs, rate):
+
+        batchsize = dilated_outputs.size(1) // rate
+
+        blocks = [dilated_outputs[:, i * batchsize: (i + 1) * batchsize, :] for i in range(rate)]
+
+        interleaved = torch.stack((blocks)).transpose(1, 0).contiguous()
+        interleaved = interleaved.view(dilated_outputs.size(0) * rate,
+                                       batchsize,
+                                       dilated_outputs.size(2))
+        return interleaved
+
+    def _pad_inputs(self, inputs, n_steps, rate):
+
+        iseven = (n_steps % rate) == 0
+
+        if not iseven:
+            dilated_steps = n_steps // rate + 1
+
+            zeros_ = torch.zeros(dilated_steps * rate - inputs.size(0),
+                                 inputs.size(1),
+                                 inputs.size(2))
+            if use_cuda:
+                zeros_ = zeros_.cuda()
+
+            inputs = torch.cat((inputs, Variable(zeros_)))
+        else:
+            dilated_steps = n_steps // rate
+
+        return inputs, dilated_steps
+
+
+    def _prepare_inputs(self, inputs, rate):
+        dilated_inputs = torch.cat([inputs[j::rate, :, :] for j in range(rate)], 1)
+        return dilated_inputs
+    
+    def init_hidden(self, batch_size, hidden_size):
+        c = Variable(torch.zeros(batch_size, hidden_size)) ############## hidden_dim??? hidden_size?? Also where is other batch_size 
+        if use_cuda:
+            c = c.cuda()
+        if self.cell_type == "LSTM":
+            m = Variable(torch.zeros(batch_size, hidden_size))  #batch_size should be part of self.batch_size I think 
+            if use_cuda:
+                m = m.cuda()
+            return (c, m)
+        else:
+            return c        
+
+
+
 
 
 # Model 3: QRNN
-class EHR_QRNN(EHRnnModule):
+class EHR_QRNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='QRNN', bii=False, time=False, preTrainEmb=''):
-        EHRnnModule.__init__(self,input_size, embed_dim ,hidden_size, n_layers = 1 ,dropout_r=0.1, cell_type='QRNN', time=False, preTrainEmb='')
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = 1 ,dropout_r=0.1, cell_type='QRNN', time=False, preTrainEmb='')
         #super(EHR_QRNN, self).__init__()
         #basically, we dont allow cell_type and bii choices
         #let's enfroce these:
@@ -129,10 +220,10 @@ class EHR_QRNN(EHRnnModule):
         
     #embedding function goes here
     def EmbedPatient_MB(self, input):
-        return EHRnnModule.EmbedPatients_MB(self,input)
+        return EHREmbeddings.EmbedPatients_MB(self,input)
     
     def EmbedPatient_SMB(self, input):
-        return EHRnnModule.EmbedPatients_SMB(self,input)    
+        return EHREmbeddings.EmbedPatients_SMB(self,input)    
     
     def forward(self, input):
         x_in , lt ,x_lens = self.EmbedPatient_MB(input)
