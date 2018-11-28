@@ -44,6 +44,8 @@ some visuals of the what the data looks like
 data = EHRdataFromPickles(root_dir = '../data/', 
                                       file = 'hf.train')
 loader =  EHRdataLoader(data)
+Note: if you want to split data, you must specify the ratios in EHRdataFromPickles()
+      otherwise, call separate loaders for your seperate data files
 
 #if you want to shuffle batches before using them, add this line 
 loader = iter_batch2(loader = loader, len(loader))
@@ -55,7 +57,7 @@ for i, batch in enumerate(loader):
 
 * To run our models, use:
 <pre>
-python main.py  --root_dire<your folder that contains data file>  --file <filename> --which_model <'RNN'>  --optimizer<'adam'>....
+python3 main.py  -root_dir<your folder that contains data file>  -file<filename> -which_model <'RNN'>  -optimizer<'adam'> ....(more args)
 </pre>
 
 
