@@ -87,7 +87,7 @@ def main():
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
     #maybe later? choose the GPU working on 
     #parser.add_argument('-cuda', type= bool, default=True, help='whether GPU is available [default:True]')
-    args = parser.parse_args()
+    args = parser.parse_args([])
     
     
     ## Move LR processing to a different module
