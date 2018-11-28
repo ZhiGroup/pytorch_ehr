@@ -57,7 +57,7 @@ for i, batch in enumerate(loader):
 
 * To run our models, use:
 <pre>
-python3 main.py -root_dir <your folder that contains data file>  -file <filename> -which_model <'RNN'>  -optimizer <'adam'> ....(more args)
+python3 main.py -root_dir<'your folder that contains data file'> -file<'filename'> -which_model<'RNN'> -optimizer<'adam'> ....(more args)
 </pre>
 
 
