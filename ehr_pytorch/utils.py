@@ -163,9 +163,10 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, bat
         torch.save(best_model, output_dir + 'EHRmodel.pth')
         torch.save(best_model.state_dict(), output_dir + 'EHRmodel.st')
         '''
-        #later you can do:
-        model = load_state_dict(torch.load(output_dir + 'EHRmodel.st'))
-        model.eval()
+        #later you can do to load previously trained model:
+        best_model= torch.load(args.output_dir + 'EHRmodel.pth')
+        best_model.load_state_dict(torch.load(args.output_dir + 'EHRmodel.st'))
+        best_model.eval()
         '''
     #Record in the log file 
     pFile = '|%f |%f |%d ' % (bestValidAuc, bestTestAuc, bestValidEpoch)
