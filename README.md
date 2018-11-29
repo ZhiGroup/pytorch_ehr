@@ -19,12 +19,12 @@
 **Data Description**
 * Cerner: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Encounters may include pharmacy, clinical and microbiology laboratory, admission, and billing information from affiliated patient care locations. All admissions, medication orders and dispensing, laboratory orders, and specimens are date and time stamped, providing a temporal relationship between treatment patterns and clinical information.These clinical data are mapped to the most common standards, for example, diagnoses and procedures are mapped to the International Classification of Diseases (ICD) codes, medications information include the national drug codes (NDCs), and laboratory tests are linked to their LOINIC codes. 
 * Processed pickle format: multil-level lists. From most outmost to gradually inside (assume we have loaded them as X)
-* 1. Outmost level: patients level, e.g. X[0] is records for patient indexed 0
-* 2. 2nd level: patient information indicated in X[0][0], X[0][1], X[0][2] are patient id, binary indicator of disease (1: yes, 0: no disease), and records
-* 3. 3rd level: a list of length of total visits. Each element will be an element of two lists (as indicated in *4*) 
-* 4. 4th level: for each row in the 3rd-level list, 1st element, e.g. X[0][2][0][0] is list of visit_time (since last time), 2nd, eg.e.g. X[0][2][1][1] is a list of codes corresponding to the visits
-* 5. 5th level: either time, or the single code. 
-* notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
+ * Outmost level: patients level, e.g. X[0] is records for patient indexed 0
+ * 2nd level: patient information indicated in X[0][0], X[0][1], X[0][2] are patient id, binary indicator of disease (1: yes, 0: no disease), and records
+ * 3rd level: a list of length of total visits. Each element will be an element of two lists (as indicated in *4*) 
+ * 4th level: for each row in the 3rd-level list, 1st element, e.g. X[0][2][0][0] is list of visit_time (since last time), 2nd, eg.e.g. X[0][2][1][1] is a list of codes corresponding to the visits
+ * 5th level: either time, or the single code. 
+ * notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
 ![data structure visual](https://github.com/ZhiGroup/pytorch_ehr/tutorials/Dataformat.png)CHANGE
 
 
