@@ -22,7 +22,7 @@
   * Outmost level: patients level, e.g. X[0] is records for patient indexed 0
   * 2nd level: patient information indicated in X[0][0], X[0][1], X[0][2] are patient id, binary indicator of disease (1: yes, 0: no disease), and records
   * 3rd level: a list of length of total visits. Each element will be an element of two lists (as indicated in *4*) 
-  * 4th level: for each row in the 3rd-level list, 1st element, e.g. X[0][2][0][0] is list of visit_time (since last time), 2nd, eg.e.g. X[0][2][1][1] is a list of codes corresponding to the visits
+  * 4th level: for each row in the 3rd-level list, 1st element, e.g. X[0][2][0][0] is list of visit_time (since last time), 2nd, e.g. X[0][2][0][1] is a list of codes corresponding to the visits
   * 5th level: either time, or the single code. 
     ![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/Dataformat.png)
    * notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
