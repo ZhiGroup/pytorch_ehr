@@ -9,7 +9,7 @@
 
 **Folder Organization**
 * ehr_pytorch: main folder with modularized components for EHR embeddings, EHR dataloader(created from pytorch dataloader), models, utils, and training and evaluation of models, main file for excution;
-* 1. EHRDataloader: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding. If you don't want to use our models, you can use it as a standalone to process data specified in **Data Description**: basically multi-level list data in pickles 
+  * EHRDataloader: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding. If you don't want to use our models, you can use it as a standalone to process data specified in **Data Description**: basically multi-level list data in pickles 
 * data: sample processed (pickled) data from Cerner, can be directly utilized for our models for demonstration purpose
 * tutorials: jupyter notebooks with examples on how to utilize our dataloader and run our models with visuals
 * test: coming up soon. Shell commands to quickly test on our package functionalities
