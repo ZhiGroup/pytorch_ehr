@@ -39,7 +39,7 @@ some visuals of the what the data looks like
 ## Tests
 
 
-* To try our dataloader, use:
+* To **singly** use our dataloader for generating data batches purpose, use:
 <pre>
 data = EHRdataFromPickles(root_dir = '../data/', 
                                       file = 'hf.train')
@@ -55,7 +55,7 @@ for i, batch in enumerate(loader):
     #feed the batch to do things
 </pre>
 
-* To run our models, use:
+* To run our models, directly use (you don't need to separately use dataloader, everything can be specified in args here):
 <pre>
 python3 main.py -root_dir<'your folder that contains data file'> -file<'filename'> -which_model<'RNN'> -optimizer<'adam'> ....(more args)
 </pre>
