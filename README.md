@@ -3,15 +3,15 @@
 
 **Overview**
 * Predictive analytics of risk onset on Cerner Electronic Health Records(EHR) using Pytorch library;
-* Cerner EHR: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Detailed info see  **Data Description** section below; 
+* Cerner EHR: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Detailed info see  **Data Description** below; 
 * Models built: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest.
 
 
 **Folder Organization**
-* ehr_pytorch: main folder with modularized components for EHR embeddings, EHR dataloader, models, utils, main file for excution;
+* ehr_pytorch: main folder with modularized components for EHR embeddings, EHR dataloader, models, utils, main execution file;
   * EHRDataloader: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding. If you don't want to use our models, you can use it as a standalone to process data specified in **Data Description**: basically multi-level list data in pickles; 
 * data: toy data with same structure (multi-level lists) of our processed Cerner data, can be directly utilized for our models for demonstration purpose;
-* tutorials: jupyter notebooks with examples on how to run our models with visuals and utilize our dataloader as a standalone; 
+* tutorials: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone; 
 * test: coming up soon. Shell commands to quickly test on our package functionalities;
 * Sphinx build documentations: coming up soon.
 
@@ -26,7 +26,7 @@
   * 5th level: either a visit_time, or a single code
   * a toy example of data structure is shown below:
     ![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/ToyData.png)
-   * notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
+   * Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
 
 
 **Paper Reference**
@@ -66,7 +66,7 @@ for i, batch in enumerate(loader):
 
 ## Authors
 
-* See the list of [contributors]( https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
+* See the list of [Contributors]( https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
 * For development related requests [Contact](https://github.com/chocolocked)
 
 ## Acknowledgements
