@@ -26,8 +26,6 @@ from torch.utils.data import Dataset, DataLoader
 #from sklearn.metrics import roc_auc_score  
 #from sklearn.metrics import roc_curve 
 
-import matplotlib
-matplotlib.use("agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
