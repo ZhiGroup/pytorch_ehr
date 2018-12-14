@@ -58,13 +58,15 @@ def main():
     
     #EHRdataloader 
     parser.add_argument('-root_dir', type = str, default = '../data/' , help='the path to the folders with pickled file(s)')
-    parser.add_argument('-file', type = str, default = 'hf.train' , help='the name of pickled files')
+    parser.add_argument('-files', type = list, default = ['hf.train'], help='''the list of name(s) of pickled file(s). 
+                        If list of 1: data will be first split into train, validation and test, then 3 dataloaders will be created.
+                        If list of 3: 3 dataloaders will be created from 3 files directly. Please give files in this order: training, validation and test''')
     parser.add_argument('-test_ratio', type = float, default = 0.2, help='test data size [default: 0.2]')
     parser.add_argument('-valid_ratio', type = float, default = 0.1, help='validation data size [default: 0.1]')
     
     #EHRmodel
-    parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","LR"}') #Do I want to keep LR here?
-    parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}')
+    parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}') #Do I want to keep LR here?#ask laila 
+    parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only') #ask laila 
     ####Think about whether you want to keep this RNN or LR based, or just call all different models
     parser.add_argument('-input_size', type = list, default =[15817], help='''input dimension(s), decide which embedding types to use. 
                         If len of 1, then  1 embedding; len of 3, embedding medical, diagnosis and others separately (3 embeddings) [default:[15817]]''')
@@ -87,43 +89,43 @@ def main():
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
     #maybe later? choose the GPU working on 
     #parser.add_argument('-cuda', type= bool, default=True, help='whether GPU is available [default:True]')
-    args = parser.parse_args([])
+    args = parser.parse_args()
     
-    
-    ## Move LR processing to a different module
-    '''
-    ## Move LR processing to a different module?? Maybe
-    ## simple load before giving to loader 
-    if args.which_model == 'LR':
-        #call another function to clean up the data first before feeding it into the loader 
-        model_x = []
-        for patient in set_x:
-            model_x.append([each for visit in patient for each in visit])  
-    else: 
-        model_x = set_x     
-    '''
     
     ####Step1. Data preparation
-    print(colored("\nLoading and preparing data...", 'green'))    
-    data = EHRdataFromPickles(root_dir = args.root_dir, 
-                              file = args.file, 
+    print(colored("\nLoading and preparing data...", 'green'))
+    if len(args.files) == 1:
+        print('1 file found. Data will be split into train, validation and test.')
+        data = EHRdataFromPickles(root_dir = args.root_dir, 
+                              file = args.files[0], 
                               sort= False,
                               test_ratio = args.test_ratio, 
                               valid_ratio = args.valid_ratio) #prevent shuffle before splitting
-    #see an example
-    #can comment out 
-    print(data.__getitem__(40, seeDescription = True)) #get a smaller one please 
     
-    # Dataloader splits
-    train, test, valid = data.__splitdata__() #this time, sort is true
-    # can comment out this part if you dont want to know what's going on here
-    print(colored("\nSample data after split:", 'green'))
-    print(
-      "train: {}".format(train[-1]),
-      "test: {}".format(test[-1]),
-      "validation: {}".format(valid[-1]), sep='\n')
-    print(colored("\nSample data lengths for train, test and validation:", 'green'))
-    print(len(train), len(test), len(valid))
+        # Dataloader splits
+        train, test, valid = data.__splitdata__() #this time, sort is true
+        # can comment out this part if you dont want to know what's going on here
+        print(colored("\nSee an example data structure from training data:", 'green'))
+        print(data.__getitem__(40, seeDescription = True))
+        
+    else:
+        print('3 files found. 3 dataloaders will be created for each')
+        train = EHRdataFromPickles(root_dir = args.root_dir, 
+                              file = args.files[0], 
+                              sort= False)
+        valid = EHRdataFromPickles(root_dir = args.root_dir, 
+                              file = args.files[1], 
+                              sort= False)
+        test = EHRdataFromPickles(root_dir = args.root_dir, 
+                              file = args.files[2], 
+                              sort= False)
+        print(colored("\nSee an example data structure from training data:", 'green'))
+        print(train.__getitem__(40, seeDescription = True))
+    
+
+    print(colored("\nSample data lengths for train, validation and test:", 'green'))
+    print(train.__len__(), valid.__len__(), test.__len__())
+    
     #separate loader for train, test, validation 
     trainloader = EHRdataloader(train) 
     validloader = EHRdataloader(valid)
@@ -159,6 +161,17 @@ def main():
                                   dropout_r=args.dropout_r, #default =0.1
                                   cell_type= 'QRNN', #doesn't support normal cell types
                                   bii= False, #QRNN doesn't support bi
+                                  time = args.time, 
+                                  preTrainEmb= args.preTrainEmb)  
+        
+    elif args.which_model == 'TLSTM': 
+        ehr_model = model.EHR_TLSTM(input_size= args.input_size, 
+                                  embed_dim=args.embed_dim, 
+                                  hidden_size= args.hidden_size,
+                                  n_layers= args.n_layers,
+                                  dropout_r=args.dropout_r, #default =0.1
+                                  cell_type= 'TLSTM', #doesn't support normal cell types
+                                  bii= False, #TLSTM do bi??? 
                                   time = args.time, 
                                   preTrainEmb= args.preTrainEmb)  
     else: 
