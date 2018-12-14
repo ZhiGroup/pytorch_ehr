@@ -26,6 +26,8 @@ from torch.utils.data import Dataset, DataLoader
 #from sklearn.metrics import roc_auc_score  
 #from sklearn.metrics import roc_curve 
 
+import matplotlib
+matplotlib.use("agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
@@ -58,7 +60,9 @@ def main():
     
     #EHRdataloader 
     parser.add_argument('-root_dir', type = str, default = '../data/' , help='the path to the folders with pickled file(s)')
-    parser.add_argument('-file', type = str, default = 'hf.train' , help='the name of pickled files')
+    parser.add_argument('-file', type = str, default = 'hf.train' , help='the name of pickled files; ALSO the prefix name for the saved model ')
+    parser.add_argument('-suffix', type = str, default = '' , help='the suffix name for the saved model ex: _RNN_GRU')
+    parser.add_argument('-split', type = bool, default = False , help='indicator of whether the data should be splitted')        
     parser.add_argument('-test_ratio', type = float, default = 0.2, help='test data size [default: 0.2]')
     parser.add_argument('-valid_ratio', type = float, default = 0.1, help='validation data size [default: 0.1]')
     
@@ -71,7 +75,7 @@ def main():
     parser.add_argument('-embed_dim', type=int, default=128, help='number of embedding dimension [default: 128]')
     parser.add_argument('-hidden_size', type=int, default=128, help='size of hidden layers [default: 128]')
     parser.add_argument('-dropout_r', type=float, default=0.1, help='the probability for dropout[default: 0.1]')
-    parser.add_argument('-n_layers', type=int, default=3, help='number of Layers, for Dilated RNNs, dilations will increase exponentialy with mumber of layers [default: 1]')
+    parser.add_argument('-n_layers', type=int, default=1, help='number of Layers, for Dilated RNNs, dilations will increase exponentialy with mumber of layers [default: 1]')
     parser.add_argument('-bii', type=bool, default=False, help='indicator of whether Bi-directin is activated. [default: False]')
     parser.add_argument('-time', type=bool, default=False, help='indicator of whether time is incorporated into embedding. [default: False]')
     parser.add_argument('-preTrainEmb', type= str, default='', help='path to pretrained embeddings file. [default:'']')
@@ -87,7 +91,7 @@ def main():
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
     #maybe later? choose the GPU working on 
     #parser.add_argument('-cuda', type= bool, default=True, help='whether GPU is available [default:True]')
-    args = parser.parse_args([])
+    args = parser.parse_args()
     
     
     ## Move LR processing to a different module
@@ -104,18 +108,34 @@ def main():
     '''
     
     ####Step1. Data preparation
-    print(colored("\nLoading and preparing data...", 'green'))    
-    data = EHRdataFromPickles(root_dir = args.root_dir, 
-                              file = args.file, 
-                              sort= False,
-                              test_ratio = args.test_ratio, 
-                              valid_ratio = args.valid_ratio) #prevent shuffle before splitting
+    print(colored("\nLoading and preparing data...", 'green'))        
+    if args.split: 
+        data = EHRdataFromPickles(root_dir = args.root_dir, 
+                                  file = args.file, 
+                                  sort= False,
+                                  test_ratio = args.test_ratio,
+                                  valid_ratio = args.valid_ratio) #prevent shuffle before splitting
+        # Dataloader splits
+        train, test, valid = data.__splitdata__() #this time, sort is true        
+    
+    else:
+        train = EHRdataFromPickles(root_dir = args.root_dir, 
+                                  file = args.file+'train', 
+                                  sort= True) 
+    
+        test = EHRdataFromPickles(root_dir = args.root_dir, 
+                                  file = args.file+'test', 
+                                  sort= True)
+         
+        valid = EHRdataFromPickles(root_dir = args.root_dir, 
+                                  file = args.file+'valid', 
+                                  sort= True)
+     
+    
     #see an example
     #can comment out 
-    print(data.__getitem__(40, seeDescription = True)) #get a smaller one please 
-    
-    # Dataloader splits
-    train, test, valid = data.__splitdata__() #this time, sort is true
+    #print(train.__getitem__(4, seeDescription = True)) #get a smaller one please
+        
     # can comment out this part if you dont want to know what's going on here
     print(colored("\nSample data after split:", 'green'))
     print(
@@ -125,9 +145,9 @@ def main():
     print(colored("\nSample data lengths for train, test and validation:", 'green'))
     print(len(train), len(test), len(valid))
     #separate loader for train, test, validation 
-    trainloader = EHRdataloader(train) 
-    validloader = EHRdataloader(valid)
-    testloader = EHRdataloader(test)
+    trainloader = EHRdataloader(train, args.batch_size) 
+    validloader = EHRdataloader(valid, args.batch_size)
+    testloader = EHRdataloader(test, args.batch_size)
     
     
     #####Step2. Model loading
@@ -159,7 +179,7 @@ def main():
                                   dropout_r=args.dropout_r, #default =0.1
                                   cell_type= 'QRNN', #doesn't support normal cell types
                                   bii= False, #QRNN doesn't support bi
-                                  time = args.time, 
+                                  time = args.time,
                                   preTrainEmb= args.preTrainEmb)  
     else: 
         ehr_model = model.EHR_LR_emb(input_size = args.input_size,
@@ -213,10 +233,12 @@ def main():
                       model = ehr_model, 
                       optimizer = optimizer,
                       shuffle = True, 
-                      batch_size = args.batch_size, 
+                      #batch_size = args.batch_size, #don't need batch_size here
                       which_model = args.which_model, 
                       patience = args.patience,
-                      output_dir = args.output_dir)
+                      output_dir = args.output_dir,
+                      model_prefix = args.file,
+                      model_suffix = args.suffix)
     #we can keyboard interupt now 
     except KeyboardInterrupt:
         print(colored('-' * 89, 'green'))
@@ -225,3 +247,19 @@ def main():
 #do the main file functions and runs 
 if __name__ == "__main__":
     main()    
+
+
+"""
+RUN THIS:
+python3.6 main.py -root_dir /data/projects/pytorch_EHR/Data/h50_cl2_all/ -file h131_ -suffix RNN.GRU -which_model RNN -cell_type GRU -lr 0.051437 -L2 0.000286 -epochs 100 -patience 5 -batch_size 100 -embed_dim 256 -hidden_size 128 -dropout_r 0. -n_layers 1 -optimizer adagrad 
+
+MODIFIED PARTS:
+ - Modify codes to take data with split options
+ - add model prefix and suffix to output file
+ - batch_size in EHRdataloader, don't use batch_size at all => need to give batch_size parameter to dataloader instead
+ - Results are different (reason: embedded => suggest: add parameter defining model in EHRmb.py)
+ - Eps (not for current optimizer Adagrad but might need later for other optimzers) 
+ - n_layer default to 1
+ - args = parser.parse_args([])
+
+""" 
