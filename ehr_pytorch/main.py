@@ -244,20 +244,4 @@ def main():
     
 #do the main file functions and runs 
 if __name__ == "__main__":
-    main()    
-
-
-"""
-RUN THIS:
-python3.6 main.py -root_dir /data/projects/pytorch_EHR/Data/h50_cl2_all/ -file h131_ -suffix RNN.GRU -which_model RNN -cell_type GRU -lr 0.051437 -L2 0.000286 -epochs 100 -patience 5 -batch_size 100 -embed_dim 256 -hidden_size 128 -dropout_r 0. -n_layers 1 -optimizer adagrad 
-
-MODIFIED PARTS:
- - Modify codes to take data with split options
- - add model prefix and suffix to output file
- - batch_size in EHRdataloader, don't use batch_size at all => need to give batch_size parameter to dataloader instead
- - Results are different (reason: embedded => suggest: add parameter defining model in EHRmb.py)
- - Eps (not for current optimizer Adagrad but might need later for other optimzers) 
- - n_layer default to 1
- - args = parser.parse_args([])
-
-""" 
+    main()
