@@ -24,8 +24,8 @@ use_cuda = torch.cuda.is_available()
 
 # Model 1:RNN & Variations: GRU, LSTM, Bi-RNN, Bi-GRU, Bi-LSTM
 class EHR_RNN(EHREmbeddings):
-    def __init__(self,input_size,embed_dim, hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU',bii=False ,time=False, preTrainEmb=''):
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU', bii=False, time=False , preTrainEmb='')
+    def __init__(self,input_size,embed_dim, hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU',bii=False ,time=False, preTrainEmb='',packPadMode = True):
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU', bii=False, time=False , preTrainEmb='',packPadMode = True)
 
 
     #embedding function goes here 
@@ -66,16 +66,17 @@ class EHR_RNN(EHREmbeddings):
 
 #Model 2: DRNN, DGRU, DLSTM
 class EHR_DRNN(EHREmbeddings): 
-    def __init__(self,input_size,embed_dim, hidden_size, n_layers, dropout_r=0.1,cell_type='GRU', bii=False, time=False, preTrainEmb=''):
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers ,dropout_r=0.1,cell_type='GRU', time=False , preTrainEmb='')
+    def __init__(self,input_size,embed_dim, hidden_size, n_layers, dropout_r=0.1,cell_type='GRU', bii=False, time=False, preTrainEmb='', packPadMode = False):
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers ,dropout_r=0.1,cell_type='GRU', time=False , preTrainEmb='', packPadMode = False)
         #super(DRNN, self).__init__()
         #The additional parameters that norma RNNs don't have
 
         self.dilations = [2 ** i for i in range(n_layers)]
         self.layers = nn.ModuleList([])
         if self.bi == 2:
-            print('DRNN dose not allow Bi-directional, implementing 1-direction instead')
-        self.bi =1  ####Enforce no bi-directional
+            print('DRNN only supports 1-direction, implementing 1-direction instead')
+        self.bi =1  #Enforcing 1-directional
+        self.packPadMode = False #Enforcing no packpadded indicator 
         
         for i in range(n_layers):
             if i == 0:
@@ -206,17 +207,18 @@ class EHR_DRNN(EHREmbeddings):
 
 
 
-
 # Model 3: QRNN
 class EHR_QRNN(EHREmbeddings):
-    def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='QRNN', bii=False, time=False, preTrainEmb=''):
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = 1 ,dropout_r=0.1, cell_type='QRNN', time=False, preTrainEmb='')
+    def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='QRNN', bii=False, time=False, preTrainEmb='', packPadMode = False):
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = 1 ,dropout_r=0.1, cell_type='QRNN', time=False, preTrainEmb='', packPadMode = False)
         #super(EHR_QRNN, self).__init__()
         #basically, we dont allow cell_type and bii choices
         #let's enfroce these:
         if (self.cell_type !='QRNN' or self.bi !=1):
             print('QRNN only supports 1-direction & QRNN cell_type implementation. Implementing corrected parameters instead')
         self.cell_type = 'QRNN'
+        self.bi = 1 #enforcing 1 directional
+        self.packPadMode = False #enforcing correct packpaddedmode
         
     #embedding function goes here
     def EmbedPatient_MB(self, input):
@@ -233,7 +235,58 @@ class EHR_QRNN(EHREmbeddings):
         return output.squeeze(), lt.squeeze()
 
 
-# Model 4: Logistic regression (with embeddings) Do we want to keep it here?  
+
+# Model 4: T-LSTM
+class EHR_TLSTM(EHREmbeddings):
+    def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='TLSTM', bii=False, time=False, preTrainEmb=''):
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = 1 ,dropout_r=0.1, cell_type='TLSTM', time=False, preTrainEmb='')
+        #test on EHR_TLSTM() parameters please
+        #modify something here to make sure everything runs correctly
+        '''ask laila if i Implemented the right model parameters regarding, time, bii, and pretrained,
+        '''
+        if self.cell_type !='TLSTM' or self.bi != 1:
+            print("TLSTM only supports 'TSTM' cell and 1 direction. Implementing corrected parameters instead")
+        self.cell_type = 'TLSTM'
+        self.bi = 1 #enforcing 1 directional
+
+        
+        #check on the packpadded sequence part and others
+    def EmbedPatient_MB(self, input):
+        return EHREmbeddings.EmbedPatients_MB(self, input)
+    
+    def EmbedPatient_SMB(self, input):
+        return EHREmbeddings.EmbedPatients_SMB(self, input)       
+
+  
+    def init_hidden(self):
+        h_0 = Variable(torch.rand(self.n_layers*self.bi,self.bsize, self.hidden_size))
+        if use_cuda:
+            h_0= h_0.cuda()
+        if self.cell_type == "LSTM"or self.cell_type == "TLSTM":
+            result = (h_0,h_0)
+        else: 
+            result = h_0
+        return result
+   
+    
+    def forward(self, input):
+        if self.multi_emb: x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
+        else: x_in , lt ,x_lens = self.EmbedPatient_MB(input)
+        x_in = x_in.permute(1,0,2) ##
+        #x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)
+        h_0 = self.init_hidden()
+        output, hidden,_ = self.rnn_c(x_in,h_0) 
+        if self.cell_type == "LSTM" or self.cell_type == "TLSTM":
+            hidden=hidden[0]
+        if self.bi==2:
+            output = self.sigmoid(self.out(torch.cat((hidden[-2],hidden[-1]),1)))
+        else:
+            output = self.sigmoid(self.out(hidden[-1]))
+        return output.squeeze(), lt.squeeze()
+
+
+
+# Model 5: Logistic regression (with embeddings) Do we want to keep it here?  
 class EHR_LR_emb(nn.Module):
     def __init__(self,input_size, embed_dim= 128, preTrainEmb= ''):    
         super(EHR_LR_emb, self).__init__()

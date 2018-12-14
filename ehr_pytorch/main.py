@@ -106,7 +106,7 @@ def main():
         train, test, valid = data.__splitdata__() #this time, sort is true
         # can comment out this part if you dont want to know what's going on here
         print(colored("\nSee an example data structure from training data:", 'green'))
-        print(data.__getitem__(40, seeDescription = True))
+        print(data.__getitem__(35, seeDescription = True))
         
     else:
         print('3 files found. 3 dataloaders will be created for each')
@@ -149,7 +149,7 @@ def main():
                                   hidden_size= args.hidden_size,
                                   n_layers= args.n_layers,
                                   dropout_r=args.dropout_r, #default =0 
-                                  cell_type=args.cell_type, #default = 'GRU'
+                                  cell_type=args.cell_type, #default ='DRNN'
                                   bii= False,
                                   time = args.time, 
                                   preTrainEmb= args.preTrainEmb)     
