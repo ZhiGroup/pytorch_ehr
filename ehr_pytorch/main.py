@@ -60,10 +60,10 @@ def main():
     parser.add_argument('-root_dir', type = str, default = '../data/' , help='the path to the folders with pickled file(s)')
     parser.add_argument('-files', type = list, default = ['hf.train'], help='''the list of name(s) of pickled file(s). 
                         If list of 1: data will be first split into train, validation and test, then 3 dataloaders will be created.
-                        If list of 3: 3 dataloaders will be created from 3 files directly. Please give files in this order: training, validation and test''')
+                        If list of 3: 3 dataloaders will be created from 3 files directly. Please give files in this order: training, validation and test.''')
     parser.add_argument('-test_ratio', type = float, default = 0.2, help='test data size [default: 0.2]')
     parser.add_argument('-valid_ratio', type = float, default = 0.1, help='validation data size [default: 0.1]')
-    
+    parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     #EHRmodel
     parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}') #Do I want to keep LR here?#ask laila 
     parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only') #ask laila 
@@ -73,18 +73,20 @@ def main():
     parser.add_argument('-embed_dim', type=int, default=128, help='number of embedding dimension [default: 128]')
     parser.add_argument('-hidden_size', type=int, default=128, help='size of hidden layers [default: 128]')
     parser.add_argument('-dropout_r', type=float, default=0.1, help='the probability for dropout[default: 0.1]')
-    parser.add_argument('-n_layers', type=int, default=3, help='number of Layers, for Dilated RNNs, dilations will increase exponentialy with mumber of layers [default: 1]')
+    parser.add_argument('-n_layers', type=int, default=1, help='number of Layers, for Dilated RNNs, dilations will increase exponentialy with mumber of layers [default: 1]')
     parser.add_argument('-bii', type=bool, default=False, help='indicator of whether Bi-directin is activated. [default: False]')
     parser.add_argument('-time', type=bool, default=False, help='indicator of whether time is incorporated into embedding. [default: False]')
     parser.add_argument('-preTrainEmb', type= str, default='', help='path to pretrained embeddings file. [default:'']')
     parser.add_argument("-output_dir",type=str, default= '../models/', help="The output directory where the best model will be saved and logs written [default: we will create'../models/'] ")
-    
+    parser.add_argument('-model_prefix', type = str, default = 'hf.train' , help='the prefix name for the saved model e.g: hf.train [default: [(training)file name]')
+    parser.add_argument('-model_customed', type = str, default = '' , help='the 2nd customed specs of name for the saved model e.g: _RNN_GRU. [default: none]')
     # training 
     parser.add_argument('-lr', type=float, default=10**-4, help='learning rate [default: 0.0001]')
     parser.add_argument('-L2', type=float, default=10**-4, help='L2 regularization [default: 0.0001]')
-    parser.add_argument('-epochs', type=int, default= 100, help='number of epochs for training [default: 100]')
+    parser.add_argument('-eps', type=float, default=10**-8, help='term to improve numerical stability [default: 0.00000001]')
+    parser.add_argument('-epochs', type=int, default= 10, help='number of epochs for training [default: 100]')
     parser.add_argument('-patience', type=int, default= 20, help='number of stagnant epochs to wait before terminating training [default: 20]')
-    parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
+    #parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     parser.add_argument('-optimizer', type=str, default='adam', choices=  ['adam','adadelta','adagrad', 'adamax', 'asgd','rmsprop', 'rprop', 'sgd'], 
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
     #maybe later? choose the GPU working on 
@@ -112,13 +114,13 @@ def main():
         print('3 files found. 3 dataloaders will be created for each')
         train = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[0], 
-                              sort= False)
+                              sort= True)
         valid = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[1], 
-                              sort= False)
+                              sort= True)
         test = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[2], 
-                              sort= False)
+                              sort= True)
         print(colored("\nSee an example data structure from training data:", 'green'))
         print(train.__getitem__(40, seeDescription = True))
     
@@ -127,9 +129,9 @@ def main():
     print(train.__len__(), valid.__len__(), test.__len__())
     
     #separate loader for train, test, validation 
-    trainloader = EHRdataloader(train) 
-    validloader = EHRdataloader(valid)
-    testloader = EHRdataloader(test)
+    trainloader = EHRdataloader(train, batch_size = args.batch_size) 
+    validloader = EHRdataloader(valid, batch_size = args.batch_size)
+    testloader = EHRdataloader(test, batch_size = args.batch_size)
     
     
     #####Step2. Model loading
@@ -185,11 +187,13 @@ def main():
     if args.optimizer.lower() == 'adam':
         optimizer = optim.Adam(ehr_model.parameters(), 
                                lr=args.lr, 
-                               weight_decay=args.L2)
+                               weight_decay=args.L2,
+                               eps = args.eps)
     elif args.optimizer.lower() == 'adadelta':
         optimizer = optim.Adadelta(ehr_model.parameters(), 
                                    lr=args.lr, 
-                                   weight_decay=args.L2)
+                                   weight_decay=args.L2,
+                                   eps = args.eps)
     elif args.optimizer.lower() == 'adagrad':
         optimizer = optim.Adagrad(ehr_model.parameters(), 
                                   lr=args.lr, 
@@ -197,7 +201,8 @@ def main():
     elif args.optimizer.lower() == 'adamax':
         optimizer = optim.Adamax(ehr_model.parameters(), 
                                  lr=args.lr, 
-                                 weight_decay=args.L2)
+                                 weight_decay=args.L2,
+                                 eps = args.eps)
     elif args.optimizer.lower() == 'asgd':
         optimizer = optim.ASGD(ehr_model.parameters(), 
                                lr=args.lr, 
@@ -205,7 +210,8 @@ def main():
     elif args.optimizer.lower() == 'rmsprop':
         optimizer = optim.RMSprop(ehr_model.parameters(), 
                                   lr=args.lr, 
-                                  weight_decay=args.L2)
+                                  weight_decay=args.L2,
+                                  eps = args.eps)
     elif args.optimizer.lower() == 'rprop':
         optimizer = optim.Rprop(ehr_model.parameters(), 
                                 lr=args.lr)
@@ -226,10 +232,12 @@ def main():
                       model = ehr_model, 
                       optimizer = optimizer,
                       shuffle = True, 
-                      batch_size = args.batch_size, 
+                      #batch_size = args.batch_size, 
                       which_model = args.which_model, 
                       patience = args.patience,
-                      output_dir = args.output_dir)
+                      output_dir = args.output_dir,
+                      model_prefix = args.model_prefix,
+                      model_customed = args.model_customed)
     #we can keyboard interupt now 
     except KeyboardInterrupt:
         print(colored('-' * 89, 'green'))
