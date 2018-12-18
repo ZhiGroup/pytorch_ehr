@@ -42,7 +42,7 @@
 
 * To run our models, directly use (you don't need to separately run dataloader, everything can be specified in args here):
 <pre>
-python3 main.py -root_dir<'your folder that contains data file'> -file<'filename'> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
+python3 main.py -root_dir<'your folder that contains data file'> -files<'filename(train)' 'filename(valid)' 'filename(test)'> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
 </pre>
 
 * To **singly** use our dataloader for generating data batches, use:
