@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Tue Nov 27 14:21:09 2018
-@author: ginnyzhu
+This Class is mainly for the creation of the EHR patients' visits embedding
+which is the key input for all the deep learning models in this Repo
+
+@authors: Lrasmy , Jzhu @ DeguiZhi Lab - UTHealth SBMI
+Last revised Mar 25 2019
+
 """
 
 import numpy as np 
@@ -10,7 +12,6 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F 
-#from torchqrnn import QRNN
 use_cuda = torch.cuda.is_available()
 
 #construct a whole embedding class from pytorch nn.module
@@ -225,7 +226,7 @@ class EHREmbeddings(nn.Module):
             lpp= lp-lpx ## diff be max seq in minibatch and cnt of pt visits
         
             if self.packPadMode:
-                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise. Ginny Done!
+                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise.
             else: 
                 zp= nn.ZeroPad2d((0,0,lpp,0))
       
