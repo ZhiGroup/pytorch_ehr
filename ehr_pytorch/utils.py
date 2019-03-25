@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # coding: utf-8
+# -*- coding: utf-8 -*-
 """
-Created on Mon Oct 29 12:57:40 2018
-
-@author: ginnyzhu
+This Class is mainly for the creation of the EHR patients' visits embedding
+which is the key input for all the deep learning models in this Repo
+@authors: Lrasmy , Jzhu @ DeguiZhi Lab - UTHealth SBMI
+Last revised Mar 25 2019
 """
 from __future__ import print_function, division
 from io import open
