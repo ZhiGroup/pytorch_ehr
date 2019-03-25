@@ -86,6 +86,7 @@ def trainsample(sample, model, optimizer, criterion = nn.BCELoss()):
 
 
 #train with loaders
+
 def trainbatches(loader, model, optimizer, shuffle = True):#,we dont need this print print_every = 10, plot_every = 5): 
     current_loss = 0
     all_losses =[]
@@ -93,7 +94,7 @@ def trainbatches(loader, model, optimizer, shuffle = True):#,we dont need this p
     n_iter = 0 
     if shuffle: 
          #we shuffle batches if shuffle is true
-         loader = iter_batch2(loader, len(loader)) 
+         loader = iter_batch2(loader, len(loader))
     for i,batch in enumerate(loader):
         #batch.to(device) #see if it works
         output, loss = trainsample(batch, model, optimizer, criterion = nn.BCELoss())
@@ -107,7 +108,9 @@ def trainbatches(loader, model, optimizer, shuffle = True):#,we dont need this p
     return current_loss, all_losses 
 
 
+
 def calculate_auc(model, loader, which_model = 'RNN', shuffle = True): # batch_size= 128 not needed
+
     y_real =[]
     y_hat= []
     if shuffle: 
@@ -129,6 +132,7 @@ def calculate_auc(model, loader, which_model = 'RNN', shuffle = True): # batch_s
 
     
 #define the final epochs running, use the different names
+
 def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, which_model = 'RNN', patience = 20, output_dir = '../models/', model_prefix = 'hf.train', model_customed= ''):  
     bestValidAuc = 0.0
     bestTestAuc = 0.0
@@ -139,6 +143,7 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, whi
     for ep in range(epochs):
         start = time.time()
         current_loss, train_loss = trainbatches(loader = train, model= model, optimizer = optimizer)
+
         train_time = timeSince(start)
         #epoch_loss.append(train_loss)
         avg_loss = np.mean(train_loss)
@@ -176,5 +181,6 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, whi
     print2file(pFile, logFile) 
     print(colored('BestValidAuc %f has a TestAuc of %f at epoch %d ' % (bestValidAuc, bestTestAuc, bestValidEpoch),'green'))
     print(colored('Details see ../models/%sEHRmodel.log' %(model_prefix + model_customed),'green'))
+
     
     

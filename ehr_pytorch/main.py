@@ -58,9 +58,12 @@ def main():
     
     #EHRdataloader 
     parser.add_argument('-root_dir', type = str, default = '../data/' , help='the path to the folders with pickled file(s)')
+    
+    ### Kept original -files variable not forcing original unique naming for files
     parser.add_argument('-files', type = list, default = ['hf.train'], help='''the list of name(s) of pickled file(s). 
                         If list of 1: data will be first split into train, validation and test, then 3 dataloaders will be created.
                         If list of 3: 3 dataloaders will be created from 3 files directly. Please give files in this order: training, validation and test.''')
+
     parser.add_argument('-test_ratio', type = float, default = 0.2, help='test data size [default: 0.2]')
     parser.add_argument('-valid_ratio', type = float, default = 0.1, help='validation data size [default: 0.1]')
     parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
@@ -95,6 +98,7 @@ def main():
     
     
     ####Step1. Data preparation
+       
     print(colored("\nLoading and preparing data...", 'green'))
     if len(args.files) == 1:
         print('1 file found. Data will be split into train, validation and test.')
@@ -102,7 +106,7 @@ def main():
                               file = args.files[0], 
                               sort= False,
                               test_ratio = args.test_ratio, 
-                              valid_ratio = args.valid_ratio) #prevent shuffle before splitting
+                              valid_ratio = args.valid_ratio) #No sort before splitting
     
         # Dataloader splits
         train, test, valid = data.__splitdata__() #this time, sort is true
@@ -132,6 +136,7 @@ def main():
     trainloader = EHRdataloader(train, batch_size = args.batch_size) 
     validloader = EHRdataloader(valid, batch_size = args.batch_size)
     testloader = EHRdataloader(test, batch_size = args.batch_size)
+
     
     
     #####Step2. Model loading
@@ -163,7 +168,7 @@ def main():
                                   dropout_r=args.dropout_r, #default =0.1
                                   cell_type= 'QRNN', #doesn't support normal cell types
                                   bii= False, #QRNN doesn't support bi
-                                  time = args.time, 
+                                  time = args.time,
                                   preTrainEmb= args.preTrainEmb)  
         
     elif args.which_model == 'TLSTM': 
@@ -238,6 +243,7 @@ def main():
                       output_dir = args.output_dir,
                       model_prefix = args.model_prefix,
                       model_customed = args.model_customed)
+
     #we can keyboard interupt now 
     except KeyboardInterrupt:
         print(colored('-' * 89, 'green'))
@@ -245,4 +251,4 @@ def main():
     
 #do the main file functions and runs 
 if __name__ == "__main__":
-    main()    
+    main()

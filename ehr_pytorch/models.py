@@ -25,7 +25,9 @@ use_cuda = torch.cuda.is_available()
 # Model 1:RNN & Variations: GRU, LSTM, Bi-RNN, Bi-GRU, Bi-LSTM
 class EHR_RNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU',bii=False ,time=False, preTrainEmb='',packPadMode = True):
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU', bii=False, time=False , preTrainEmb='',packPadMode = True)
+
+       	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, bii, time , preTrainEmb, packPadMode)
+
 
 
     #embedding function goes here 
@@ -67,7 +69,9 @@ class EHR_RNN(EHREmbeddings):
 #Model 2: DRNN, DGRU, DLSTM
 class EHR_DRNN(EHREmbeddings): 
     def __init__(self,input_size,embed_dim, hidden_size, n_layers, dropout_r=0.1,cell_type='GRU', bii=False, time=False, preTrainEmb='', packPadMode = False):
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers ,dropout_r=0.1,cell_type='GRU', time=False , preTrainEmb='', packPadMode = False)
+
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
+
         #super(DRNN, self).__init__()
         #The additional parameters that norma RNNs don't have
 
@@ -210,7 +214,9 @@ class EHR_DRNN(EHREmbeddings):
 # Model 3: QRNN
 class EHR_QRNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='QRNN', bii=False, time=False, preTrainEmb='', packPadMode = False):
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = 1 ,dropout_r=0.1, cell_type='QRNN', time=False, preTrainEmb='', packPadMode = False)
+
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
+
         #super(EHR_QRNN, self).__init__()
         #basically, we dont allow cell_type and bii choices
         #let's enfroce these:
@@ -239,7 +245,9 @@ class EHR_QRNN(EHREmbeddings):
 # Model 4: T-LSTM
 class EHR_TLSTM(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='TLSTM', bii=False, time=False, preTrainEmb=''):
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = 1 ,dropout_r=0.1, cell_type='TLSTM', time=False, preTrainEmb='')
+
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb)
+
         #test on EHR_TLSTM() parameters please
         #modify something here to make sure everything runs correctly
         '''ask laila if i Implemented the right model parameters regarding, time, bii, and pretrained,
