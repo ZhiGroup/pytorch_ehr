@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Tue Nov 27 14:21:09 2018
-@author: ginnyzhu
+This Class is mainly for the creation of the EHR patients' visits embedding
+which is the key input for all the deep learning models in this Repo
+
+@authors: Lrasmy , Jzhu @ DeguiZhi Lab - UTHealth SBMI
+Last revised Mar 25 2019
+
 """
 
 import numpy as np 
@@ -10,16 +12,15 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F 
-#from torchqrnn import QRNN
 use_cuda = torch.cuda.is_available()
 
 #construct a whole embedding class from pytorch nn.module
 #then we call this class in models after we define it 
 class EHREmbeddings(nn.Module):
     #initialization and then the forward and things
-    #DRNN has no bi 
+    #DRNN has no bi, QRNN no bi, TLSTM has no bi, but DRNN has other cell-types 
     #cel_type are different for each model variation 
-    def __init__(self, input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='LSTM', bii=False, time=False , preTrainEmb=''):
+    def __init__(self, input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='LSTM', bii=False, time=False , preTrainEmb='', packPadMode = True):
         super(EHREmbeddings, self).__init__()
         self.embed_dim = embed_dim
         self.hidden_size = hidden_size
@@ -28,6 +29,7 @@ class EHREmbeddings(nn.Module):
         self.cell_type = cell_type
         self.time=time
         self.preTrainEmb=preTrainEmb
+        self.packPadMode = packPadMode
         if bii: 
             self.bi=2 
         else: 
@@ -68,14 +70,20 @@ class EHREmbeddings(nn.Module):
         elif self.cell_type == "QRNN":
             from torchqrnn import QRNN
             self.cell = QRNN
+        elif self.cell_type == "TLSTM":
+            from tplstm import TPLSTM
+            self.cell = TPLSTM 
         else:
             raise NotImplementedError
        
         if self.cell_type == "QRNN": 
-            self.bi=1 ### QRNN not support Bidirectional, DRNN should not be BiDirectional???? Ask Laila, get rid of here
+            self.bi=1 ### QRNN not support Bidirectional, DRNN should not be BiDirectional either.
             self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers= self.n_layers, dropout= self.dropout_r)
+        elif self.cell_type == "TLSTM":
+            self.bi=1 
+            self.rnn_c = self.cell(self.in_size, hidden_size)
         else:
-            self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers=n_layers, dropout= self.dropout_r, bidirectional=self.bi)
+            self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers=self.n_layers, dropout= self.dropout_r, bidirectional=self.bi)
          
         self.out = nn.Linear(self.hidden_size*self.bi,1)
         self.sigmoid = nn.Sigmoid()
@@ -113,14 +121,17 @@ class EHREmbeddings(nn.Module):
                 pd=(0, (llv -len(ehr_seq[1])))
                 result = F.pad(torch.from_numpy(np.asarray(ehr_seq[1],dtype=int)).type(lnt_typ),pd,"constant", 0)
                 ehr_seq_tl.append(result)
-                if self.time:                 
+                if self.cell_type == 'TLSTM': #Ginny the correct implementation for TLSTM time
+                    time_dim.append(Variable(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ)))
+                elif self.time:                 
                     time_dim.append(Variable(torch.div(flt_typ([1.0]), torch.log(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ) + flt_typ([2.7183])))))
-    
+            
+            
             ehr_seq_t= Variable(torch.stack(ehr_seq_tl,0)) 
-            lpp= lp-lpx ## diff be max seq in minibatch and cnt of pt visits
-            if self.bi == 2:
-                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise. MODIFIED HERE
-            else:
+            lpp= lp-lpx ## diff be max seq in minibatch and cnt of pt visits PLEASE MODIFY 
+            if self.packPadMode:
+                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise. Ginny Done!
+            else: 
                 zp= nn.ZeroPad2d((0,0,lpp,0))
             ehr_seq_t= zp(ehr_seq_t) ## zero pad the visits med codes
             mb.append(ehr_seq_t)
@@ -206,17 +217,18 @@ class EHREmbeddings(nn.Module):
                     else: resulto = F.pad(torch.from_numpy(np.asarray(ehr_seq[1][2],dtype=int)).type(lnt_typ),pdo,"constant", 0)
                     ehr_seq_tlo.append(resulto)
                 
-                if self.time:                 
-                    #time_dim.append(Variable(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ)))
-                    # use log time as RETAIN
+                if self.cell_type == 'TLSTM': #Ginny: correct implementation for TLSTM time
+                    time_dim.append(Variable(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ)))
+                elif self.time:                 
                     time_dim.append(Variable(torch.div(flt_typ([1.0]), torch.log(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ) + flt_typ([2.7183])))))
+            
                     
             lpp= lp-lpx ## diff be max seq in minibatch and cnt of pt visits
-            if self.bi == 2:
-                zp= nn.ZeroPad2d((0,0,0,lpp)) ## GINNY Changed here(0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise. MODIFIED HERE
-            else:
+        
+            if self.packPadMode:
+                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise.
+            else: 
                 zp= nn.ZeroPad2d((0,0,lpp,0))
-            #zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise
       
             if self.diag==1:
                 ehr_seq_td= Variable(torch.stack(ehr_seq_tld,0))

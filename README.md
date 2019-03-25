@@ -42,14 +42,14 @@
 
 * To run our models, directly use (you don't need to separately run dataloader, everything can be specified in args here):
 <pre>
-python3 main.py -root_dir<'your folder that contains data file'> -file<'filename'> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
+python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['filename(train)' 'filename(valid)' 'filename(test)']> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
 </pre>
 
 * To **singly** use our dataloader for generating data batches, use:
 <pre>
 data = EHRdataFromPickles(root_dir = '../data/', 
-                          file = 'toy.train')
-loader =  EHRdataLoader(data)
+                          file = ['toy.train'])
+loader =  EHRdataLoader(data, batch_size = 128)
 #Note: if you want to split data, you must specify the ratios in EHRdataFromPickles()
       #otherwise, call separate loaders for your seperate data files
 

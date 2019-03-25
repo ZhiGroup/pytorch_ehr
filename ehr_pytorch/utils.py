@@ -34,7 +34,7 @@ import EHRDataloader
 from EHRDataloader import iter_batch2
 #silly ones
 from termcolor import colored
-#from logging import FileHandler
+
 
 #check this later
 use_cuda = torch.cuda.is_available()
@@ -86,7 +86,8 @@ def trainsample(sample, model, optimizer, criterion = nn.BCELoss()):
 
 
 #train with loaders
-def trainbatches(loader, model, optimizer, shuffle = True):# we dont need this print print_every = 10, plot_every = 5): 
+
+def trainbatches(loader, model, optimizer, shuffle = True):#,we dont need this print print_every = 10, plot_every = 5): 
     current_loss = 0
     all_losses =[]
     plot_every = 5
@@ -107,7 +108,9 @@ def trainbatches(loader, model, optimizer, shuffle = True):# we dont need this p
     return current_loss, all_losses 
 
 
-def calculate_auc(model, loader, which_model = 'RNN', shuffle = True): 
+
+def calculate_auc(model, loader, which_model = 'RNN', shuffle = True): # batch_size= 128 not needed
+
     y_real =[]
     y_hat= []
     if shuffle: 
@@ -120,7 +123,7 @@ def calculate_auc(model, loader, which_model = 'RNN', shuffle = True):
                 y_real.extend(label_tensor.cpu().data.view(-1).numpy())
          
             else: 
-                #The minor case, basically embedding LR and GRU-LR. Do we want to keep it?
+                #The minor case, basically embedding LR and GRU-LR case. Do we want to keep it?
                 y_hat.append(output.cpu().data.numpy()[0][0])
                 y_real.append(label_tensor.cpu().data.numpy()[0][0])
     
@@ -129,16 +132,18 @@ def calculate_auc(model, loader, which_model = 'RNN', shuffle = True):
 
     
 #define the final epochs running, use the different names
-def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, which_model = 'RNN', patience = 20, output_dir = '../models/', model_prefix = '', model_suffix = ''): #add a prefix and suffix option for the model, modified by Mia
+
+def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, which_model = 'RNN', patience = 20, output_dir = '../models/', model_prefix = 'hf.train', model_customed= ''):  
     bestValidAuc = 0.0
     bestTestAuc = 0.0
     bestValidEpoch = 0
-    header = 'BestValidAUC|TestAUC|atEpoch'
-    logFile = output_dir + model_prefix + 'EHRmodel.' + model_suffix + '.log'
-    print2file(header, logFile)
+    #header = 'BestValidAUC|TestAUC|atEpoch'
+    #logFile = output_dir + model_prefix + model_customed +'EHRmodel.log'
+    #print2file(header, logFile)
     for ep in range(epochs):
         start = time.time()
-        current_loss, train_loss = trainbatches(loader = train, model= model, optimizer = optimizer) 
+        current_loss, train_loss = trainbatches(loader = train, model= model, optimizer = optimizer)
+
         train_time = timeSince(start)
         #epoch_loss.append(train_loss)
         avg_loss = np.mean(train_loss)
@@ -156,22 +161,26 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, whi
         if ep - bestValidEpoch > patience:
               break
           
-        bestTestAuc, _, _ = calculate_auc(model = best_model, loader = test, which_model = which_model, shuffle = shuffle)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        #save model & parameters
-        torch.save(best_model, output_dir + model_prefix + 'EHRmodel.' + model_suffix + '.pth')
-        torch.save(best_model.state_dict(), output_dir + model_prefix + 'EHRmodel.' + model_suffix + '.st')
-        '''
-        #later you can do to load previously trained model:
-        best_model= torch.load(args.output_dir + 'EHRmodel.pth')
-        best_model.load_state_dict(torch.load(args.output_dir + 'EHRmodel.st'))
-        best_model.eval()
-        '''
-    #Record in the log file 
+    bestTestAuc, _, _ = calculate_auc(model = best_model, loader = test, which_model = which_model, shuffle = shuffle)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    #save model & parameters
+    torch.save(best_model, output_dir + model_prefix + model_customed + 'EHRmodel.pth')
+    torch.save(best_model.state_dict(), output_dir + model_prefix + model_customed + 'EHRmodel.st')
+    '''
+    #later you can do to load previously trained model:
+    best_model= torch.load(args.output_dir + model_prefix + model_customed + 'EHRmodel.pth')
+    best_model.load_state_dict(torch.load(args.output_dir + model_prefix + model_customed + 'EHRmodel.st'))
+    best_model.eval()
+    '''
+    #Record in the log file
+    header = 'BestValidAUC|TestAUC|atEpoch'
+    logFile = output_dir + model_prefix + model_customed +'EHRmodel.log'
+    print2file(header, logFile)
     pFile = '|%f |%f |%d ' % (bestValidAuc, bestTestAuc, bestValidEpoch)
     print2file(pFile, logFile) 
     print(colored('BestValidAuc %f has a TestAuc of %f at epoch %d ' % (bestValidAuc, bestTestAuc, bestValidEpoch),'green'))
-    print(colored('Details see ../models/%sEHRmodel.%s.log' %(model_prefix, model_suffix),'green'))
+    print(colored('Details see ../models/%sEHRmodel.log' %(model_prefix + model_customed),'green'))
+
     
     

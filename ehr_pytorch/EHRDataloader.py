@@ -121,24 +121,6 @@ class EHRdataFromPickles(Dataset):
 def my_collate(batch):
     return list(batch)          
             
-#can delete later
-'''
-def iter_batch(iterable, samplesize):
-    results = []
-    iterator = iter(iterable)
-    for _ in range(samplesize):
-        results.append(iterator.__next__())
-    random.shuffle(results)  
-    #print(results)
-    for i, v in enumerate(iterator, samplesize): 
-        r = random.randint(0, i)
-        if r < samplesize:
-            results[r] = v  
-            #print(v)
-    if len(results) < samplesize:
-        raise ValueError("Sample larger than population.")
-    return results
-'''
 
 def iter_batch2(iterable, samplesize):
     results = []
@@ -147,16 +129,6 @@ def iter_batch2(iterable, samplesize):
     for _ in range(samplesize):
         results.append(iterator.__next__())
     random.shuffle(results)  
-    
-    ''' 
-    for i, v in enumerate(iterator, samplesize): 
-        r = random.randint(0, i)
-        if r < samplesize:
-            results[r] = v  # at a decreasing rate, replace random items
-            #print(v)
-    if len(results) < samplesize:
-        raise ValueError("Sample larger than population.")
-    '''
     return results
 
 class EHRdataloader(DataLoader):
