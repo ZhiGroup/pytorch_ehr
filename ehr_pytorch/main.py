@@ -62,7 +62,7 @@ def main():
     parser.add_argument('-root_dir', type = str, default = '../data/' , help='the path to the folders with pickled file(s)')
     
     ### Kept original -files variable not forcing original unique naming for files
-    parser.add_argument('-files', type = list, default = ['hf.train'], help='''the list of name(s) of pickled file(s). 
+    parser.add_argument('-files', nargs='+', default = 'hf.train', help='''the name(s) of pickled file(s), separtaed by space. so the argument will be saved as a list 
                         If list of 1: data will be first split into train, validation and test, then 3 dataloaders will be created.
                         If list of 3: 3 dataloaders will be created from 3 files directly. Please give files in this order: training, validation and test.''')
 
@@ -73,7 +73,7 @@ def main():
     parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}') #Do I want to keep LR here?#ask laila 
     parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only') #ask laila 
     ####Think about whether you want to keep this RNN or LR based, or just call all different models
-    parser.add_argument('-input_size', type = list, default =[15817], help='''input dimension(s), decide which embedding types to use. 
+    parser.add_argument('-input_size', nargs='+', type=int , default = 15817, help='''input dimension(s) separated in space the output will be a list, decide which embedding types to use. 
                         If len of 1, then  1 embedding; len of 3, embedding medical, diagnosis and others separately (3 embeddings) [default:[15817]]''')
     parser.add_argument('-embed_dim', type=int, default=128, help='number of embedding dimension [default: 128]')
     parser.add_argument('-hidden_size', type=int, default=128, help='size of hidden layers [default: 128]')
