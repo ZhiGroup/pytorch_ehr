@@ -3,7 +3,7 @@ This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
 
 @authors: Lrasmy , Jzhu @ DeguiZhi Lab - UTHealth SBMI
-Last revised Mar 25 2019
+Last revised June 2nd 2019
 
 """
 
@@ -83,7 +83,7 @@ class EHREmbeddings(nn.Module):
             self.bi=1 
             self.rnn_c = self.cell(self.in_size, hidden_size)
         else:
-            self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers=self.n_layers, dropout= self.dropout_r, bidirectional=self.bi)
+            self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers=self.n_layers, dropout= self.dropout_r, bidirectional=bii, batch_first=True)
          
         self.out = nn.Linear(self.hidden_size*self.bi,1)
         self.sigmoid = nn.Sigmoid()
