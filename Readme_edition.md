@@ -42,6 +42,7 @@ a toy example of data structure is shown below:
 Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
 
 **Paper Reference**
+
 The paper upon which this repo was built. (to-do: include paper link)
 
 **Dependencies**
