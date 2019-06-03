@@ -30,7 +30,7 @@
 
 
 **Paper Reference**
-* The [paper]() upon which this repo was built. (to-do: include paper link)
+* The [paper](RNNisAllyouNeedv01.docx) upon which this repo was built. (to-do: include paper link)
 
 
 ## Prerequisites
