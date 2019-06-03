@@ -46,8 +46,8 @@ The paper upon which this repo was built. (to-do: include paper link)
 
 **Dependencies**
 * Pytorch 0.4.0, http://pytorch.org
-* Torchqrnn 
-* Pynvrtc (needed for torchqrnn)
+* Torchqrnn , https://github.com/salesforce/pytorch-qrnn
+* Pynvrtc (needed for torchqrnn), https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateApr2019/ehr_pytorch/tplstm.py
 * Tplstm (attached in our files)
 * Matplotlib (## ASK: Do we actually need it?)
 * Python: 3.6+
