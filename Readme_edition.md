@@ -1,18 +1,17 @@
-# Pytorch_ehr
+# Predictive analytics of risk onset on Cerner Electronic Health Records(EHR) using Pytorch library
 ***************** 
 
 **Overview**
+In order to predict the current and future states of patients, we have built multiple models on electronic health records (EHRs) which contain histories of patients' diagnoses, medications, and other various events.This project develops and combines multiple predictive models, including Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest to analyze and predict clinical performaces. 
 
-* Predictive analytics of risk onset on Cerner Electronic Health Records(EHR) using Pytorch library;
 * Cerner EHR: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Detailed info see Data Description below;
-* Models built: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest. 
-  Note: If you don't want to use our models, you can use it as a standalone to process data specified in Data Description: basically multi-level list data in pickles;
+* Note: If you don't want to use our models, you can use it as a standalone to process data specified in Data Description: basically multi-level list data in pickles;
 
 **Folder Organization**
 * ehr_pytorch: main folder with modularized components:
     * EHREmb.py: EHR embeddings
     * EHRDataloader.py: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding.
-    * Models.py
+    * Models.py: multiple different models
     * Utils.py
     * main.py: main execution file
     * tplstm.py: tplstm package file
@@ -60,7 +59,15 @@ The [paper]() upon which this repo was built. (to-do: include paper link)
 <pre>
 python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['filename(train)' 'filename(valid)' 'filename(test)']> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
 </pre>
+* Example:
 
+<pre>
+python3.7 main.py -root_dir /.../Data/ -files sample.train sample.valid sample.test -input_size 15800 -batch_size 100 -which_model LR -lr 0.01 -eps 1e-06 -L2 1e-04
+</pre>
+
+<pre>
+python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['filename(train)' 'filename(valid)' 'filename(test)']> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
+</pre>
 * To singly use our dataloader for generating data batches, use:
 <pre>
 data = EHRdataFromPickles(root_dir = '../data/', 
