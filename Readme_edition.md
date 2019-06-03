@@ -68,14 +68,12 @@ data = EHRdataFromPickles(root_dir = '../data/',
 loader =  EHRdataLoader(data, batch_size = 128)
 </pre>  
   #Note: If you want to split data, you must specify the ratios in EHRdataFromPickles()
-         otherwise, call separate loaders for your seperate data files
-
+         otherwise, call separate loaders for your seperate data files 
          If you want to shuffle batches before using them, add this line 
  <pre>
 loader = iter_batch2(loader = loader, len(loader))
 </pre>
-
-         otherwise, directly call 
+    otherwise, directly call 
 <pre>
 for i, batch in enumerate(loader): 
     #feed the batch to do things
