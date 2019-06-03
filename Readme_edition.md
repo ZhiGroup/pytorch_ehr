@@ -66,9 +66,7 @@ python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['fil
 python3.7 main.py -root_dir /.../Data/ -files sample.train sample.valid sample.test -input_size 15800 -batch_size 100 -which_model LR -lr 0.01 -eps 1e-06 -L2 1e-04
 </pre>
 
-<pre>
-python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['filename(train)' 'filename(valid)' 'filename(test)']> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
-</pre>
+
 * To singly use our dataloader for generating data batches, use:
 <pre>
 data = EHRdataFromPickles(root_dir = '../data/', 
