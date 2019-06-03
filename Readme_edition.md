@@ -73,7 +73,8 @@ loader =  EHRdataLoader(data, batch_size = 128)
  <pre>
 loader = iter_batch2(loader = loader, len(loader))
 </pre>
-    otherwise, directly call 
+otherwise, directly call 
+
 <pre>
 for i, batch in enumerate(loader): 
     #feed the batch to do things
