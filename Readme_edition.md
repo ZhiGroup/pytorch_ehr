@@ -24,9 +24,9 @@
     * data_preprocessing_v1.py: preprocess the data from dataset to build the required multi-level input structure
 * Tutorials 
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
-ToyData.png (Do we have to include this in our folders? )  
-test: coming up soon. Shell commands to quickly test on our package functionalities;
-Sphinx build documentationdocumentations: coming up soon.
+    * ToyData.png (Do we have to include this in our folders? )  
+* test: coming up soon. Shell commands to quickly test on our package functionalities;
+* Sphinx build documentationdocumentations: coming up soon.
 
 **Data Description**
 
