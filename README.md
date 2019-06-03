@@ -47,9 +47,9 @@ python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['fil
 
 * To **singly** use our dataloader for generating data batches, use:
 <pre>
-data = EHRdataFromPickles(root_dir = '../data/', 
-                          file = ['toy.train'])
+data = EHRdataFromPickles(root_dir = '../data/', file = ['toy.train'])
 loader =  EHRdataLoader(data, batch_size = 128)
+</pre>
 #Note: if you want to split data, you must specify the ratios in EHRdataFromPickles()
       #otherwise, call separate loaders for your seperate data files
 
@@ -57,6 +57,7 @@ loader =  EHRdataLoader(data, batch_size = 128)
 loader = iter_batch2(loader = loader, len(loader))
 
 #otherwise, directly call 
+<pre>
 for i, batch in enumerate(loader): 
     #feed the batch to do things
 </pre>
