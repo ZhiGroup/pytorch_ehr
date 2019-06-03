@@ -2,6 +2,7 @@
 ***************** 
 
 **Overview**
+
 In order to predict the current and future states of patients, we have built multiple models on electronic health records (EHRs) which contain histories of patients' diagnoses, medications, and other various events.This project develops and combines multiple predictive models, including Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest to analyze and predict clinical performaces. 
 
 * Cerner EHR: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Detailed info see Data Description below;
