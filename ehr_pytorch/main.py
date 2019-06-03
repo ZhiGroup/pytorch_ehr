@@ -4,7 +4,7 @@
 This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
 @authors: Lrasmy , Jzhu  @ DeguiZhi Lab - UTHealth SBMI
-Last revised Mar 25 2019
+Last revised Jun 2 2019
 """
 from __future__ import print_function, division
 from io import open
@@ -108,7 +108,8 @@ def main():
                               file = args.files[0], 
                               sort= False,
                               test_ratio = args.test_ratio, 
-                              valid_ratio = args.valid_ratio) #No sort before splitting
+                              valid_ratio = args.valid_ratio,
+                              model=args.which_model) #No sort before splitting
     
         # Dataloader splits
         train, test, valid = data.__splitdata__() #this time, sort is true
@@ -120,13 +121,16 @@ def main():
         print('3 files found. 3 dataloaders will be created for each')
         train = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[0], 
-                              sort= True)
+                              sort= True,
+                              model=args.which_model)
         valid = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[1], 
-                              sort= True)
+                              sort= True,
+                              model=args.which_model)
         test = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[2], 
-                              sort= True)
+                              sort= True,
+                              model=args.which_model)
         print(colored("\nSee an example data structure from training data:", 'green'))
         print(train.__getitem__(40, seeDescription = True))
     
