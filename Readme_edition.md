@@ -80,10 +80,11 @@ Check out this notebook with a step by step guide of how to utilize our package.
 **Authors**
 See the list of Contributors
 For development related requests Contact
-Acknowledgements
+
+**Acknowledgements**
 Hat-tip to:
-DRNN github
-QRNN github
-T-LSTM paper
+* [DRNN github](https://github.com/zalandoresearch/pt-dilate-rnn)
+* [QRNN github](https://github.com/salesforce/pytorch-qrnn)
+* [T-LSTM paper](http://biometrics.cse.msu.edu/Publications/MachineLearning/Baytasetal_PatientSubtypingViaTimeAwareLSTMNetworks.pdf)
 
 
