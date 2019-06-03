@@ -55,9 +55,15 @@ class EHR_RNN(EHREmbeddings):
             x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
         else: 
             x_in , lt ,x_lens = self.EmbedPatient_MB(input) 
-        x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)   
+        ### uncomment the below lines if you like to initiate hidden to random
         #h_0= self.init_hidden()
-        output, hidden = self.rnn_c(x_inp)#,h_0) 
+        #if use_cuda: h_0.cuda()
+        if packPadMode:    
+            x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)   
+            output, hidden = self.rnn_c(x_inp)#,h_0) 
+        else:
+            output, hidden = self.rnn_c(x_in)#,h_0) 
+        
         if self.cell_type == "LSTM":
             hidden=hidden[0]
         if self.bi==2:
@@ -65,7 +71,6 @@ class EHR_RNN(EHREmbeddings):
         else:
             output = self.sigmoid(self.out(hidden[-1]))
         return output.squeeze(), lt.squeeze()
-
 
 #Model 2: DRNN, DGRU, DLSTM
 class EHR_DRNN(EHREmbeddings): 
