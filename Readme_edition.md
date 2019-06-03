@@ -16,7 +16,6 @@
     * Utils.py
     * main.py: main execution file
     * tplstm.py: tplstm package file
-    * trochqrnn.py: torchqrnn package file
     * __pycache__ folder???
 * Data
     * toy.train: pickle file of  toy data with the same structure (multi-level lists) of our processed Cerner data, can be directly utilized for our models for demonstration purpose;
@@ -36,21 +35,24 @@
     * Outmost level: patients level, e.g. X[0] is the records for patient indexed 0
     * 2nd level: patient information indicated in X[0][0], X[0][1], X[0][2] are patient id, disease status (1: yes, 0: no disease), and records
     * 3rd level: a list of length of total visits. Each element will be an element of two lists (as indicated in 4)
-    * 4th level: for each row in the 3rd-level list. 1st element, e.g. X[0][2][0][0] is list of visit_time (since last time), 2nd element, e.g. X[0][2][0][1] is a list of codes corresponding to a single visit
+    * 4th level: for each row in the 3rd-level list. 
+        *1st element, e.g. X[0][2][0][0] is list of visit_time (since last time)
+        *2nd element, e.g. X[0][2][0][1] is a list of codes corresponding to a single visit
     * 5th level: either a visit_time, or a single code
-a toy example of data structure is shown below: 
+*  A toy example of data structure is shown below: 
+![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/ToyData.png)
 Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
 
 **Paper Reference**
 
-The paper upon which this repo was built. (to-do: include paper link)
+The [paper]() upon which this repo was built. (to-do: include paper link)
 
 **Dependencies**
 * Pytorch 0.4.0, http://pytorch.org
 * Torchqrnn , https://github.com/salesforce/pytorch-qrnn
-* Pynvrtc (needed for torchqrnn), https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateApr2019/ehr_pytorch/tplstm.py
-* Tplstm (attached in our files)
-* Matplotlib (## ASK: Do we actually need it?)
+* Pynvrtc, https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateApr2019/ehr_pytorch/tplstm.py
+* Tplstm 
+* Matplotlib
 * Python: 3.6+
 
 **Usage**
@@ -64,19 +66,22 @@ python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['fil
 data = EHRdataFromPickles(root_dir = '../data/', 
                           file = ['toy.train'])
 loader =  EHRdataLoader(data, batch_size = 128)
-</pre>
-#Note: if you want to split data, you must specify the ratios in EHRdataFromPickles()
-      #otherwise, call separate loaders for your seperate data files
+</pre>  
+  #Note: If you want to split data, you must specify the ratios in EHRdataFromPickles()
+         otherwise, call separate loaders for your seperate data files
 
-#if you want to shuffle batches before using them, add this line 
+         If you want to shuffle batches before using them, add this line 
+ <pre>
 loader = iter_batch2(loader = loader, len(loader))
+</pre>
 
-#otherwise, directly call 
+         otherwise, directly call 
 <pre>
 for i, batch in enumerate(loader): 
     #feed the batch to do things
 </pre>
-Check out this notebook with a step by step guide of how to utilize our package.
+
+Check out this [notebook](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/RNN_tutorials_toy.ipynb) with a step by step guide of how to utilize our package. 
 
 **Authors**
 See the list of Contributors
