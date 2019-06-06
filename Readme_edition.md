@@ -1,4 +1,4 @@
-# Predictive analytics of risk onset on Cerner Electronic Health Records(EHR) using Pytorch library
+# Predictive Analytics of Risk Onset on Cerner Electronic Health Records(EHR) using Pytorch Library
 ***************** 
 
 **Overview**
