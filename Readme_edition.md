@@ -16,7 +16,6 @@ In order to predict the current and future states of patients, we have built mul
     * Utils.py
     * main.py: main execution file
     * tplstm.py: tplstm package file
-    * __pycache__ folder???
 * Data
     * toy.train: pickle file of  toy data with the same structure (multi-level lists) of our processed Cerner data, can be directly utilized for our models for demonstration purpose;
 * Preprocessing
