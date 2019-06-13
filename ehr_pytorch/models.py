@@ -11,31 +11,36 @@ import torch.nn as nn
 from torch.autograd import Variable
 #from torch import optim
 import torch.nn.functional as F
+
 #from torchqrnn import QRNN
 #import bnlstm
 
 
-##### modify the name of module accordingly
+
 #from embedding import EHRembeddings 
 from EHREmb import EHREmbeddings
 
 use_cuda = torch.cuda.is_available()
-##################TO DO: cell-type cleanup!
-#### For DRNN & QRNN: should always override self.bi ==1 (ASK)
+
+##################TO DO: cell-type cleanup! XIN: did we???????????????????????????????????
+#### For DRNN & QRNN: should always override self.bi ==1 (ASK)   XIN: did we???????????????????????????????????
 
 # Model 1:RNN & Variations: GRU, LSTM, Bi-RNN, Bi-GRU, Bi-LSTM
 class EHR_RNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU',bii=False ,time=False, preTrainEmb='',packPadMode = True):
 
        	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, bii, time , preTrainEmb, packPadMode)
-
-
-
-    #embedding function goes here 
+    
     def EmbedPatient_MB(self, input):
+        """
+        Call embedding functions without splitted inputs
+        """
         return EHREmbeddings.EmbedPatients_MB(self, input)
     
     def EmbedPatient_SMB(self, input):
+        """
+        Call embedding functions without splitted inputs
+        """
         return EHREmbeddings.EmbedPatients_SMB(self, input)       
      
     def init_hidden(self):
@@ -50,14 +55,17 @@ class EHR_RNN(EHREmbeddings):
         return result
     
     def forward(self, input):
-        #print(type(input))
+        #   Embedding
         if self.multi_emb:
             x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
         else: 
             x_in , lt ,x_lens = self.EmbedPatient_MB(input) 
-        ### uncomment the below lines if you like to initiate hidden to random
+        #   Uncomment the below lines if you like to initiate hidden to random
         #h_0= self.init_hidden()
-        #if use_cuda: h_0.cuda()
+        #if use_cuda: 
+        #h_0.cuda()
+        
+        # Build the RNN Model with / without pack pad mode
         if packPadMode:    
             x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)   
             output, hidden = self.rnn_c(x_inp)#,h_0) 
@@ -72,21 +80,24 @@ class EHR_RNN(EHREmbeddings):
             output = self.sigmoid(self.out(hidden[-1]))
         return output.squeeze(), lt.squeeze()
 
-#Model 2: DRNN, DGRU, DLSTM
+# Model 2: DRNN, DGRU, DLSTM
 class EHR_DRNN(EHREmbeddings): 
     def __init__(self,input_size,embed_dim, hidden_size, n_layers, dropout_r=0.1,cell_type='GRU', bii=False, time=False, preTrainEmb='', packPadMode = False):
 
         EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
 
         #super(DRNN, self).__init__()
-        #The additional parameters that norma RNNs don't have
+        #The additional parameters that normal RNNs don't have
 
         self.dilations = [2 ** i for i in range(n_layers)]
         self.layers = nn.ModuleList([])
+        #check if DRNN can only be 1 directional, if that is the case then we always have self.bi = 1 
         if self.bi == 2:
             print('DRNN only supports 1-direction, implementing 1-direction instead')
-        self.bi =1  #Enforcing 1-directional
-        self.packPadMode = False #Enforcing no packpadded indicator 
+        # Enforcing 1-directional
+        self.bi =1  
+        # Enforcing no packpadded indicator 
+        self.packPadMode = False 
         
         for i in range(n_layers):
             if i == 0:
@@ -95,8 +106,8 @@ class EHR_DRNN(EHREmbeddings):
                 c = self.cell(self.hidden_size, self.hidden_size, dropout=self.dropout_r)
             self.layers.append(c)
         self.cells = nn.Sequential(*self.layers)
-        #check if DRNN can only be 1 directional, if that is the case then we always have self.bi = 1 
-        #self.out = nn.Linear(hidden_size,1)
+       
+        #self.out = nn.Linear(hidden_size,1) ## XIN: WHY THIS???????????????????????????????????
 
     def EmbedPatient_MB(self, input):
         return EHREmbeddings.EmbedPatients_MB(self,input)
@@ -128,12 +139,9 @@ class EHR_DRNN(EHREmbeddings):
 
         #n_steps = len(inputs)
         n_steps = inputs.size(0)
-        #print('n_steps',n_steps) 
         #batch_size = inputs[0].size(0)
         batch_size = inputs.size(1)
-        #print('batch size',batch_size) --verified correct
         hidden_size = cell.hidden_size
-        #print('hidden size',hidden_size) --verified correct
 
         inputs, dilated_steps = self._pad_inputs(inputs, n_steps, rate)
         dilated_inputs = self._prepare_inputs(inputs, rate)
@@ -224,11 +232,11 @@ class EHR_QRNN(EHREmbeddings):
         EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
 
         #super(EHR_QRNN, self).__init__()
-        #basically, we dont allow cell_type and bii choices
-        #let's enfroce these:
+       
+        #check if QRNN can only be 1 directional, if that is the case then we always have self.bi = 1 
         if (self.cell_type !='QRNN' or self.bi !=1):
             print('QRNN only supports 1-direction & QRNN cell_type implementation. Implementing corrected parameters instead')
-        self.cell_type = 'QRNN'
+        self.cell_type = 'QRNN' # enforcing cell type
         self.bi = 1 #enforcing 1 directional
         self.packPadMode = False #enforcing correct packpaddedmode
         
@@ -252,19 +260,14 @@ class EHR_QRNN(EHREmbeddings):
 class EHR_TLSTM(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='TLSTM', bii=False, time=False, preTrainEmb=''):
 
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb)
-
-        #test on EHR_TLSTM() parameters please
-        #modify something here to make sure everything runs correctly
-        '''ask laila if i Implemented the right model parameters regarding, time, bii, and pretrained,
-        '''
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb
+        # check if QRNN can only be 1 directional, if that is the case then we always have self.bi = 1 
         if self.cell_type !='TLSTM' or self.bi != 1:
             print("TLSTM only supports 'TSTM' cell and 1 direction. Implementing corrected parameters instead")
-        self.cell_type = 'TLSTM'
+        self.cell_type = 'TLSTM' #enforcing cell type
         self.bi = 1 #enforcing 1 directional
 
-        
-        #check on the packpadded sequence part and others
+
     def EmbedPatient_MB(self, input):
         return EHREmbeddings.EmbedPatients_MB(self, input)
     
@@ -273,6 +276,9 @@ class EHR_TLSTM(EHREmbeddings):
 
   
     def init_hidden(self):
+        """
+        Initialize the hidden layer
+        """
         h_0 = Variable(torch.rand(self.n_layers*self.bi,self.bsize, self.hidden_size))
         if use_cuda:
             h_0= h_0.cuda()
@@ -286,8 +292,8 @@ class EHR_TLSTM(EHREmbeddings):
     def forward(self, input):
         if self.multi_emb: x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
         else: x_in , lt ,x_lens = self.EmbedPatient_MB(input)
-        x_in = x_in.permute(1,0,2) ##
-        #x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)
+        x_in = x_in.permute(1,0,2) ## TLSTM not support batch first
+        #x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True) ## XIN: DO WE HAVE TO USE IF STATEMENT TO CHECK WHETHER WE USE PACK_PADDED SEQUENCE?
         h_0 = self.init_hidden()
         output, hidden,_ = self.rnn_c(x_in,h_0) 
         if self.cell_type == "LSTM" or self.cell_type == "TLSTM":
@@ -300,7 +306,7 @@ class EHR_TLSTM(EHREmbeddings):
 
 
 
-# Model 5: Logistic regression (with embeddings) Do we want to keep it here?  
+# Model 5: Logistic regression 
 class EHR_LR_emb(nn.Module):
     def __init__(self,input_size, embed_dim= 128, preTrainEmb= ''):    
         super(EHR_LR_emb, self).__init__()
@@ -309,7 +315,6 @@ class EHR_LR_emb(nn.Module):
         self.out = nn.Linear(self.embed_dim,1)
         self.sigmoid = nn.Sigmoid()
         self.preTrainEmb=preTrainEmb
-        #Need to modify here 
         if len(self.preTrainEmb) >0 :
            emb_t= torch.FloatTensor(np.asmatrix(self.preTrainEmb))
            self.embed_dim = emb_t.size(1)
@@ -319,22 +324,53 @@ class EHR_LR_emb(nn.Module):
            self.embedding.weight.requires_grad=False
          
         else:
-           self.embedding = nn.Embedding(input_size, self.embed_dim) 
+            if len(input_size)==1:
+                # Initialization of single embedding
+                self.multi_emb=False
+                input_size=input_size[0]
+                self.embedding= nn.Embedding(input_size,self.embed_dim)
+                self.in_size= embed_dim
+            elif len(input_size)!=3: 
+                raise ValueError('the input list either of 1 or 3 length')
+            else: 
+                # Initialization of diag, med and oth embeddings
+                self.multi_emb=True
+                self.diag=self.med=self.oth=1
+                if input_size[0]> 0 : 
+                    self.embed_d= nn.Embedding(input_size[0], self.embed_dim,padding_idx=0)#,scale_grad_by_freq=True)
+                else: 
+                    self.diag=0
+                if input_size[1]> 0 : 
+                    self.embed_m= nn.Embedding(input_size[1],self.embed_dim,padding_idx=0)#,scale_grad_by_freq=True)
+                else: 
+                    self.med=0
+                if input_size[2]> 0 : 
+                    self.embed_o= nn.Embedding(input_size[2],self.embed_dim,padding_idx=0)#,scale_grad_by_freq=True)
+                else: 
+                    self.oth=0
+                # Concatination of diag, med and oth embeddings
+                self.in_size=(self.diag+self.med+self.oth)*self.embed_dim
+                self.embedding = torch.cat((embedded_d,embedded_m,embedded_o),dim=2)
+        
         
 
     def forward(self, input):  
-        label, ehr_seq = input[0] 
-        #print(input[0]) #real-time check
+        # unpack and initialize different values
+        sk, label, ehr_seq = input
         label_tensor = Variable(torch.FloatTensor([[float(label)]]))
+        # check cuda availability
         if use_cuda:
             label_tensor = label_tensor.cuda()
+        # Initialize our data into a long sequence of EHR code
         if use_cuda:
             result = Variable(torch.LongTensor([int(v) for v in ehr_seq])).cuda() 
         else:
             result = Variable(torch.LongTensor([int(v) for v in ehr_seq])) 
-        embedded = self.embedding(result).view(-1, self.embed_dim) #modified, instead of (-1,1, self.hidden_size) => use (-1,self.hidden_size)
-        embedded = torch.sum(embedded, dim=0).view(1,-1)#modified,instead of (1,1,-1) => use .view(1,-1) 
+        
+        # Call the embedding
+        embedded = self.embedding(result).view(-1, self.embed_dim) 
+        embedded = torch.sum(embedded, dim=0).view(1,-1)
         output = self.sigmoid(self.out(embedded))
         
-        return output, label_tensor #return output and also label tensor 
+        return output, label_tensor 
 
