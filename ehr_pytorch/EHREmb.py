@@ -14,14 +14,16 @@ from torch.autograd import Variable
 import torch.nn.functional as F 
 use_cuda = torch.cuda.is_available()
 
-#construct a whole embedding class from pytorch nn.module
-#then we call this class in models after we define it 
+# Construct a whole embedding class from pytorch nn.module
+# Then we call this class in models after we define it 
+
 class EHREmbeddings(nn.Module):
-    #initialization and then the forward and things
-    #DRNN has no bi, QRNN no bi, TLSTM has no bi, but DRNN has other cell-types 
-    #cel_type are different for each model variation 
+    # Initialization and then the forward the embedding
+    # DRNN has no bi, QRNN no bi, TLSTM has no bi, but DRNN has other cell-types 
+    # cel_type are different for each model variation 
     def __init__(self, input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='LSTM', bii=False, time=False , preTrainEmb='', packPadMode = True):
         super(EHREmbeddings, self).__init__()
+        # Initialize the hyperparmeters
         self.embed_dim = embed_dim
         self.hidden_size = hidden_size
         self.n_layers = n_layers
@@ -34,7 +36,7 @@ class EHREmbeddings(nn.Module):
             self.bi=2 
         else: 
             self.bi=1
-            
+        # Initialize the single embedding 
         if len(input_size)==1:
             self.multi_emb=False
             if len(self.preTrainEmb)>0:
@@ -45,8 +47,11 @@ class EHREmbeddings(nn.Module):
                 input_size=input_size[0]
                 self.embed= nn.Embedding(input_size, self.embed_dim,padding_idx=0)#,scale_grad_by_freq=True)
                 self.in_size= embed_dim
-        else:
-            if len(input_size)!=3: raise ValueError('the input list either of 1 or 3 length')
+        
+        # Initialize the multi-embedding
+        else: 
+            if len(input_size)!=3: 
+                raise ValueError('the input list either of 1 or 3 length')
             else: 
                 self.multi_emb=True
                 self.diag=self.med=self.oth=1
@@ -89,20 +94,20 @@ class EHREmbeddings(nn.Module):
         self.sigmoid = nn.Sigmoid()
       
                             
-    #let's define this class method
-    def EmbedPatients_MB(self,input): #let's define this
-    
+    # Construct the embedding without splitted inputs
+    def EmbedPatients_MB(self,input): 
+        # Check cuda availability
         if use_cuda:
             flt_typ=torch.cuda.FloatTensor
             lnt_typ=torch.cuda.LongTensor
         else: 
             lnt_typ=torch.LongTensor
             flt_typ=torch.FloatTensor
-        mb=[]
+        mb=[] 
         mtd=[]
         lbt=[]
         seq_l=[]
-        self.bsize=len(input) ## no of pts in minibatch
+        self.bsize=len(input) ## number of patients in minibatch
         lp= len(max(input, key=lambda xmb: len(xmb[-1]))[-1]) ## maximum number of visits per patients in minibatch
         llv=0
         for x in input:
