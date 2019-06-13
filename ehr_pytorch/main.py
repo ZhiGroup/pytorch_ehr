@@ -37,8 +37,7 @@ try:
 except:
     import pickle
     
-#import self-defined modules
-#models, utils, and Dataloader
+#import self-defined modules: models, utils, and Dataloader
 import models as model 
 #import EHRDataloader as dataloader
 from EHRDataloader import EHRdataFromPickles, EHRdataloader  #do modifications later
@@ -70,8 +69,8 @@ def main():
     parser.add_argument('-valid_ratio', type = float, default = 0.1, help='validation data size [default: 0.1]')
     parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     #EHRmodel
-    parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}') #Do I want to keep LR here?#ask laila 
-    parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only') #ask laila 
+    parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}') 
+    parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only)') 
     ####Think about whether you want to keep this RNN or LR based, or just call all different models
     parser.add_argument('-input_size', nargs='+', type=int , default = [15817], help='''input dimension(s) separated in space the output will be a list, decide which embedding types to use. 
                         If len of 1, then  1 embedding; len of 3, embedding medical, diagnosis and others separately (3 embeddings) [default:[15817]]''')
@@ -94,7 +93,6 @@ def main():
     #parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     parser.add_argument('-optimizer', type=str, default='adam', choices=  ['adam','adadelta','adagrad', 'adamax', 'asgd','rmsprop', 'rprop', 'sgd'], 
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
-    #maybe later? choose the GPU working on 
     #parser.add_argument('-cuda', type= bool, default=True, help='whether GPU is available [default:True]')
     args = parser.parse_args()
     
@@ -146,6 +144,7 @@ def main():
     
     
     #####Step2. Model loading
+    # Upper/lower case matters for model.
     if args.which_model == 'RNN': 
         ehr_model = model.EHR_RNN(input_size= args.input_size, 
                                   embed_dim=args.embed_dim, 
@@ -194,6 +193,7 @@ def main():
     #make sure cuda is working
     if use_cuda:
         ehr_model = ehr_model.cuda() 
+        
     #model optimizers to choose from. Upper/lower case dont matter
     if args.optimizer.lower() == 'adam':
         optimizer = optim.Adam(ehr_model.parameters(), 
