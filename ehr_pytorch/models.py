@@ -29,7 +29,7 @@ use_cuda = torch.cuda.is_available()
 class EHR_RNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU',bii=False ,time=False, preTrainEmb='',packPadMode = True):
 
-       	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, bii, time , preTrainEmb, packPadMode)
+       EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = n_layers, dropout_r=dropout_r, cell_type=cell_type, bii = bii, time=time, preTrainEmb = preTrainEmb, packPadMode=packPadMode)
     
     def EmbedPatient_MB(self, input):
         """
@@ -84,7 +84,7 @@ class EHR_RNN(EHREmbeddings):
 class EHR_DRNN(EHREmbeddings): 
     def __init__(self,input_size,embed_dim, hidden_size, n_layers, dropout_r=0.1,cell_type='GRU', bii=False, time=False, preTrainEmb='', packPadMode = False):
 
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = n_layers, dropout_r=dropout_r, cell_type=cell_type, bii = bii, time=time, preTrainEmb = preTrainEmb, packPadMode=packPadMode)
 
         #super(DRNN, self).__init__()
         #The additional parameters that normal RNNs don't have
@@ -229,8 +229,7 @@ class EHR_DRNN(EHREmbeddings):
 class EHR_QRNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='QRNN', bii=False, time=False, preTrainEmb='', packPadMode = False):
 
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
-
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = n_layers, dropout_r=dropout_r, cell_type=cell_type, bii = bii, time=time, preTrainEmb = preTrainEmb, packPadMode=packPadMode)
         #super(EHR_QRNN, self).__init__()
        
         #check if QRNN can only be 1 directional, if that is the case then we always have self.bi = 1 
@@ -260,7 +259,7 @@ class EHR_QRNN(EHREmbeddings):
 class EHR_TLSTM(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='TLSTM', bii=False, time=False, preTrainEmb=''):
 
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb
+        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers = n_layers, dropout_r=dropout_r, cell_type=cell_type, bii = bii, time=time, preTrainEmb = preTrainEmb)
         # check if QRNN can only be 1 directional, if that is the case then we always have self.bi = 1 
         if self.cell_type !='TLSTM' or self.bi != 1:
             print("TLSTM only supports 'TSTM' cell and 1 direction. Implementing corrected parameters instead")
