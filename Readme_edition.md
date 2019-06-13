@@ -1,4 +1,4 @@
-# Predictive Analytics of Risk Onset on Cerner Electronic Health Records(EHR) using Pytorch Library
+# Predictive Analytics of Risk Onset Electronic Health Records(EHR) using Pytorch Library
 ***************** 
 
 **Overview**
@@ -22,9 +22,8 @@ In order to predict the current and future states of patients, we have built mul
     * data_preprocessing_v1.py: preprocess the data from dataset to build the required multi-level input structure
 * Tutorials 
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
-    * ToyData.png (Do we have to include this in our folders? )  
-* test: coming up soon. Shell commands to quickly test on our package functionalities;
-* Sphinx build documentationdocumentations: coming up soon.
+    * ToyData.png 
+
 
 **Data Description**
 
