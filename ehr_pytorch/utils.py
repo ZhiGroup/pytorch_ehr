@@ -34,7 +34,7 @@ import numpy as np
 
 import EHRDataloader
 from EHRDataloader import iter_batch2
-#silly ones
+
 from termcolor import colored
 
 
@@ -78,6 +78,8 @@ def print2file(buf, outFile):
 
 ###### major model training utilities
 def trainsample(sample, model, optimizer, criterion = nn.BCELoss()): 
+    """
+    """
     model.zero_grad()
     output, label_tensor = model(sample)   
     loss = criterion(output, label_tensor)    
@@ -89,8 +91,10 @@ def trainsample(sample, model, optimizer, criterion = nn.BCELoss()):
 
 #train with loaders
 
-def trainbatches(loader, model, optimizer, shuffle = True, which_model = 'RNN'):#,we dont need this print print_every = 10, plot_every = 5): 
-    current_loss = 0
+def trainbatches(loader, model, optimizer, shuffle = True, which_model = 'RNN'):
+    """
+    Train the model for each batch in the loader
+    """
     all_losses =[]
     plot_every = 5
     n_iter = 0 
@@ -116,7 +120,9 @@ def trainbatches(loader, model, optimizer, shuffle = True, which_model = 'RNN'):
 
 
 def calculate_auc(model, loader, which_model = 'RNN', shuffle = True): # batch_size= 128 not needed
-
+    """
+    Calculate the roc accuracy score for the extire data loader
+    """
     y_real =[]
     y_hat= []
     if shuffle: 
@@ -142,6 +148,9 @@ def calculate_auc(model, loader, which_model = 'RNN', shuffle = True): # batch_s
    
 
 def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, which_model = 'RNN', patience = 20, output_dir = '../models/', model_prefix = 'hf.train', model_customed= ''):  
+    """
+    Major function to train the model and test the scores for each epoch
+    """
     bestValidAuc = 0.0
     bestTestAuc = 0.0
     bestValidEpoch = 0
@@ -151,7 +160,6 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, whi
     for ep in range(epochs):
         start = time.time()
         current_loss, train_loss = trainbatches(loader = train, model= model, optimizer = optimizer, which_model = which_model)
-
         train_time = timeSince(start)
         #epoch_loss.append(train_loss)
         avg_loss = np.mean(train_loss)
