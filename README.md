@@ -20,14 +20,21 @@ In order to predict the current and future states of patients, we have built mul
     * toy.train: pickle file of  toy data with the same structure (multi-level lists) of our processed Cerner data, can be directly utilized for our models for demonstration purpose;
 * Preprocessing
     * data_preprocessing_v1.py: preprocess the data from dataset to build the required multi-level input structure
+      (clear description of how to run this file is in its document header)
 * Tutorials 
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
+    * HF prediction for Diabetic Patients Pre and Post Diabetes.ipynb
+    * Early Readmission v2.ipynb
     * ToyData.png 
-
+* trained_models examples:
+    * hf.trainEHRmodel.log: examples of the output of the model
+    * hf.trainEHRmodel.pth: actual trained model
+    * hf.trainEHRmodel.st: state dictionary
 
 **Data Description**
 
 *  Cerner: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Encounters may include pharmacy, clinical and microbiology laboratory, admission, and billing information from affiliated patient care locations. All admissions, medication orders and dispensing, laboratory orders, and specimens are date and time stamped, providing a temporal relationship between treatment patterns and clinical information.These clinical data are mapped to the most common standards, for example, diagnoses and procedures are mapped to the International Classification of Diseases (ICD) codes, medimultications information include the national drug codes (NDCs), and laboratory tests are linked to their LOINIC codes.
+
 
 *  Our processed pickle data: multi-level lists. From most outmost to gradually inside (assume we have loaded them as X)
     * Outmost level: patients level, e.g. X[0] is the records for patient indexed 0
@@ -43,14 +50,14 @@ Notes: as long as you have multi-level list you can use our EHRdataloader to gen
 
 **Paper Reference**
 
-The [paper]() upon which this repo was built. (to-do: include paper link)
+The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. (to-do: include paper link)
 
 **Dependencies**
 * Pytorch 0.4.0, http://pytorch.org
 * Torchqrnn , https://github.com/salesforce/pytorch-qrnn
 * Pynvrtc, https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateApr2019/ehr_pytorch/tplstm.py
-* Tplstm 
-* Matplotlib
+* sklearn
+* Matplotlib (for visualizations)
 * Python: 3.6+
 
 **Usage**
