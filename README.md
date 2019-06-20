@@ -1,4 +1,4 @@
-# Predictive Analytics of Risk Onset Electronic Health Records(EHR) using Pytorch Library
+# Predictive Analytics of Risk Onset Electronic Health Records(EHR) using Pytorch Library (XIN)
 ***************** 
 
 **Overview**
