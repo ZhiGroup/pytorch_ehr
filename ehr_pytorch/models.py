@@ -27,7 +27,7 @@ use_cuda = torch.cuda.is_available()
 class EHR_RNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers=1,dropout_r=0.1,cell_type='GRU',bii=False ,time=False, preTrainEmb='',packPadMode = True):
 
-       	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, bii, time , preTrainEmb, packPadMode)
+       	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=n_layers, dropout_r=dropout_r, cell_type=cell_type, bii=bii, time=time , preTrainEmb=preTrainEmb, packPadMode=packPadMode)
 
 
 
@@ -76,7 +76,7 @@ class EHR_RNN(EHREmbeddings):
 class EHR_DRNN(EHREmbeddings): 
     def __init__(self,input_size,embed_dim, hidden_size, n_layers, dropout_r=0.1,cell_type='GRU', bii=False, time=False, preTrainEmb='', packPadMode = False):
 
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
+       	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=n_layers, dropout_r=dropout_r, cell_type=cell_type,bii=False, time=time , preTrainEmb=preTrainEmb, packPadMode=False)
 
         #super(DRNN, self).__init__()
         #The additional parameters that norma RNNs don't have
@@ -221,7 +221,7 @@ class EHR_DRNN(EHREmbeddings):
 class EHR_QRNN(EHREmbeddings):
     def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='QRNN', bii=False, time=False, preTrainEmb='', packPadMode = False):
 
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb, packPadMode)
+       	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=n_layers, dropout_r=dropout_r, cell_type=cell_type, bii=bii, time=time , preTrainEmb=preTrainEmb, packPadMode=packPadMode)
 
         #super(EHR_QRNN, self).__init__()
         #basically, we dont allow cell_type and bii choices
@@ -250,9 +250,10 @@ class EHR_QRNN(EHREmbeddings):
 
 # Model 4: T-LSTM
 class EHR_TLSTM(EHREmbeddings):
-    def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='TLSTM', bii=False, time=False, preTrainEmb=''):
+    def __init__(self,input_size,embed_dim, hidden_size, n_layers =1 ,dropout_r=0.1, cell_type='TLSTM', bii=False, time=True, preTrainEmb=''):
 
         EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb)
+       	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=n_layers, dropout_r=dropout_r, cell_type=cell_type, bii=False, time=True , preTrainEmb=preTrainEmb, packPadMode=False)
 
         #test on EHR_TLSTM() parameters please
         #modify something here to make sure everything runs correctly
@@ -287,7 +288,7 @@ class EHR_TLSTM(EHREmbeddings):
         if self.multi_emb: x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
         else: x_in , lt ,x_lens = self.EmbedPatient_MB(input)
         x_in = x_in.permute(1,0,2) ##
-        #x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)
+        #x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)### not well tested
         h_0 = self.init_hidden()
         output, hidden,_ = self.rnn_c(x_in,h_0) 
         if self.cell_type == "LSTM" or self.cell_type == "TLSTM":
