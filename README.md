@@ -9,6 +9,10 @@ Based on existing works (e.g., Dr. AI and RETAIN), we represent electronic healt
 
 Currently, this repo include the following predictive models: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN,and T-LSTM to analyze and predict clinical performaces. Additionally we have tutorials comparing perfomance to plain LR, Random Forest. 
 
+**Pipeline**
+
+![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Pipeline.png)
+
 
 **Folder Organization**
 * [ehr_pytorch](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/ehr_pytorch): main folder with modularized components:
@@ -50,8 +54,6 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
 ![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Data%20structure%20with%20explanation.png)
 ![data example](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/data.png)
 * Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
-* Our Model to process the data is shown below:
-![model](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Model.png)
 
 **Paper Reference**
 
