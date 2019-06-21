@@ -187,9 +187,15 @@ def main():
                                   bii= False, #TLSTM do bi??? 
                                   time = args.time, 
                                   preTrainEmb= args.preTrainEmb)  
+    elif args.which_model == 'RETAIN': 
+        ehr_model = model.RETAIN(input_size= args.input_size, 
+                                  embed_dim=args.embed_dim, 
+                                  hidden_size= args.hidden_size,
+                                  n_layers= args.n_layers) 
     else: 
         ehr_model = model.EHR_LR_emb(input_size = args.input_size,
                                      embed_dim = args.embed_dim,
+                                     cell_type = 'LR',
                                      preTrainEmb= args.preTrainEmb)
     #make sure cuda is working
     if use_cuda:
