@@ -61,7 +61,7 @@ The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Med
 **Dependencies**
 * [Pytorch 0.4.0] (http://pytorch.org)
 * [Torchqrnn] (https://github.com/salesforce/pytorch-qrnn)
-* [Pynvrtc] (https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateApr2019/ehr_pytorch/tplstm.py)
+* Pynvrtc
 * sklearn
 * Matplotlib (for visualizations)
 * Python: 3.6+
@@ -105,7 +105,7 @@ Check out this [notebook](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tu
 
 **Authors**
 See the list of [Contributors](https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
-For development related requests Contact
+For development related requests, contact Degui.Zhi@uth.tmc.edu
 
 **Acknowledgements**
 Hat-tip to:
