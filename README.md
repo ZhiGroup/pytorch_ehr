@@ -27,7 +27,7 @@ Currently, this repo includes the following predictive models: Vanilla RNN, GRU,
 * Preprocessing
     * [data_preprocessing_v1.py](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Preprocessing/data_preprocessing_v1.py): preprocess the data from dataset to build the required multi-level input structure
       (clear description of how to run this file is in its document header)
-* [Tutorials] (https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Tutorials)
+* [Tutorials](https://github.com/ZhiGroup/pytorch_ehr/tree/MasterUpdateJun2019/tutorials)
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
     * HF prediction for Diabetic Patients Pre and Post Diabetes.ipynb
     * Early Readmission v2.ipynb
