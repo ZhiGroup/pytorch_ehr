@@ -58,7 +58,7 @@ class EHR_RNN(EHREmbeddings):
         ### uncomment the below lines if you like to initiate hidden to random
         #h_0= self.init_hidden()
         #if use_cuda: h_0.cuda()
-        if packPadMode:    
+        if self.packPadMode: 
             x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)   
             output, hidden = self.rnn_c(x_inp)#,h_0) 
         else:
@@ -260,9 +260,10 @@ class EHR_TLSTM(EHREmbeddings):
         '''ask laila if i Implemented the right model parameters regarding, time, bii, and pretrained,
         '''
         if self.cell_type !='TLSTM' or self.bi != 1:
-            print("TLSTM only supports 'TSTM' cell and 1 direction. Implementing corrected parameters instead")
+            print("TLSTM only supports Time aware LSTM cell type and 1 direction. Implementing corrected parameters instead")
         self.cell_type = 'TLSTM'
         self.bi = 1 #enforcing 1 directional
+        self.packPadMode = False
 
         
         #check on the packpadded sequence part and others

@@ -20,16 +20,16 @@ use_cuda = torch.cuda.is_available()
 class TPLSTM(nn.Module):
     def __init__(self, input_size, hidden_size, bias=True):
         super(TPLSTM, self).__init__()
-        self.input_size = input_size
+        self.input_size = input_size -1 ### as the last element is time and we split it our from oun input and assign to gate
         self.hidden_size = hidden_size
         self.bias = bias
-        self.weight_ih = Parameter(torch.Tensor(4 * hidden_size, input_size))
-        self.weight_hh = Parameter(torch.Tensor(4 * hidden_size, hidden_size))
-        self.W_decomp = Parameter(torch.Tensor(hidden_size, hidden_size))
+        self.weight_ih = Parameter(torch.Tensor(4 * self.hidden_size, self.input_size))
+        self.weight_hh = Parameter(torch.Tensor(4 * self.hidden_size, self.hidden_size))
+        self.W_decomp = Parameter(torch.Tensor(self.hidden_size, self.hidden_size))
         if bias:
-            self.bias_ih = Parameter(torch.Tensor(4 * hidden_size))
-            self.bias_hh = Parameter(torch.Tensor(4 * hidden_size))
-            self.b_decomp = Parameter(torch.Tensor(hidden_size))
+            self.bias_ih = Parameter(torch.Tensor(4 * self.hidden_size))
+            self.bias_hh = Parameter(torch.Tensor(4 * self.hidden_size))
+            self.b_decomp = Parameter(torch.Tensor(self.hidden_size))
 
         else:
             self.register_parameter('bias_ih', None)
