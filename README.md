@@ -47,8 +47,11 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
         *  2nd element, e.g. X[0][2][0][1] is a list of codes corresponding to a single visit
     * 5th level: either a visit_time, or a single code
 *  A toy example of data structure is shown below: 
-![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/ToyData.png)
+![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Data%20structure%20with%20explanation.png)
+![data example](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/data.png)
 Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
+*  Our Model to process the data is shown below:
+   ![model](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Model.png)
 
 **Paper Reference**
 
