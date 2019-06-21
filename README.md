@@ -23,7 +23,7 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
 * Preprocessing
     * [data_preprocessing_v1.py](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Preprocessing/data_preprocessing_v1.py): preprocess the data from dataset to build the required multi-level input structure
       (clear description of how to run this file is in its document header)
-* Tutorials 
+* [Tutorials] (https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Tutorials)
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
     * HF prediction for Diabetic Patients Pre and Post Diabetes.ipynb
     * Early Readmission v2.ipynb
@@ -55,14 +55,18 @@ Notes: as long as you have multi-level list you can use our EHRdataloader to gen
 The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. (to-do: include paper link)
 
 **Dependencies**
-* Pytorch 0.4.0, http://pytorch.org
-* Torchqrnn , https://github.com/salesforce/pytorch-qrnn
-* Pynvrtc, https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateApr2019/ehr_pytorch/tplstm.py
+* [Pytorch 0.4.0] (http://pytorch.org)
+* [Torchqrnn] (https://github.com/salesforce/pytorch-qrnn)
+* [Pynvrtc] (https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateApr2019/ehr_pytorch/tplstm.py)
 * sklearn
 * Matplotlib (for visualizations)
 * Python: 3.6+
 
 **Usage**
+* For preprocessing
+ python data_preprocessing.py <Case File> <Control File> <types dictionary if available,otherwise use 'NA' to build new one> <output Files Prefix> 
+The above case and control files each is just a three columns table like pt_id | medical_code | visit/event_date  
+
 * To run our models, directly use (you don't need to separately run dataloader, everything can be specified in args here):
 <pre>
 python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['filename(train)' 'filename(valid)' 'filename(test)']> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
