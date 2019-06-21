@@ -7,11 +7,11 @@ Although there are plenty of repos on vision and NLP models, there are very limi
 
 Based on existing works (e.g., Dr. AI and RETAIN), we represent electronic health records (EHRs) using the pickled list of list of list, which contain histories of patients' diagnoses, medications, and other various events. We integrated all relevant information of a patient's history, allowing easy subsetting.
 
-Currently, this repo include the following predictive models: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest to analyze and predict clinical performaces. 
+Currently, this repo include the following predictive models: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN,and T-LSTM to analyze and predict clinical performaces. Additionally we have tutorials comparing perfomance to plain LR, Random Forest. 
 
 
 **Folder Organization**
-* ehr_pytorch: main folder with modularized components:
+* [ehr_pytorch](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/ehr_pytorch): main folder with modularized components:
     * EHREmb.py: EHR embeddings
     * EHRDataloader.py: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding.
     * Models.py: multiple different models
@@ -21,7 +21,7 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
 * Data
     * toy.train: pickle file of  toy data with the same structure (multi-level lists) of our processed Cerner data, can be directly utilized for our models for demonstration purpose;
 * Preprocessing
-    * data_preprocessing_v1.py: preprocess the data from dataset to build the required multi-level input structure
+    * [data_preprocessing_v1.py](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Preprocessing/data_preprocessing_v1.py): preprocess the data from dataset to build the required multi-level input structure
       (clear description of how to run this file is in its document header)
 * Tutorials 
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
