@@ -7,7 +7,7 @@ Although there are plenty of repos on vision and NLP models, there are very limi
 
 Based on existing works (e.g., Dr. AI and RETAIN), we represent electronic health records (EHRs) using the pickled list of list of list, which contain histories of patients' diagnoses, medications, and other various events. We integrated all relevant information of a patient's history, allowing easy subsetting.
 
-Currently, this repo include the following predictive models: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN,and T-LSTM to analyze and predict clinical performaces. Additionally we have tutorials comparing perfomance to plain LR, Random Forest. 
+Currently, this repo includes the following predictive models: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN,and T-LSTM to analyze and predict clinical performaces. Additionally we have tutorials comparing perfomance to plain LR, Random Forest. 
 
 **Pipeline**
 
@@ -31,7 +31,6 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
     * HF prediction for Diabetic Patients Pre and Post Diabetes.ipynb
     * Early Readmission v2.ipynb
-    * ToyData.png 
 * trained_models examples:
     * hf.trainEHRmodel.log: examples of the output of the model
     * hf.trainEHRmodel.pth: actual trained model
@@ -57,7 +56,7 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
 
 **Paper Reference**
 
-The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. (to-do: include paper link)
+The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. 
 
 **Dependencies**
 * [Pytorch 0.4.0] (http://pytorch.org)
@@ -105,7 +104,7 @@ for i, batch in enumerate(loader):
 Check out this [notebook](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/RNN_tutorials_toy.ipynb) with a step by step guide of how to utilize our package. 
 
 **Authors**
-See the list of Contributors
+See the list of [Contributors](https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
 For development related requests Contact
 
 **Acknowledgements**
