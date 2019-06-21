@@ -1,12 +1,14 @@
-# Predictive Analytics of Risk Onset Electronic Health Records(EHR) using Pytorch Library
+# Predictive Modeling in Electronic Health Records(EHR) using Pytorch
 ***************** 
 
 **Overview**
 
-In order to predict the current and future states of patients, we have built multiple models on electronic health records (EHRs) which contain histories of patients' diagnoses, medications, and other various events.This project develops and combines multiple predictive models, including Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest to analyze and predict clinical performaces. 
+Although there are plenty of repos on vision and NLP models, there are very limited repos on EHR using deep learning that we can find. Here we open source our repo, implementing data preprocessing, data loading, and a zoo of common RNN models. The main goal is to lower the bar of entering this field for researchers. We are not claiming any state-of-the-art performance, though our models are quite competitive (a paper describing our work will be available soon).  
 
-* Cerner EHR: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Detailed info see Data Description below;
-* Note: If you don't want to use our models, you can use it as a standalone to process data specified in Data Description: basically multi-level list data in pickles;
+Based on existing works (e.g., Dr. AI and RETAIN), we represent electronic health records (EHRs) using the pickled list of list of list, which contain histories of patients' diagnoses, medications, and other various events. We integrated all relevant information of a patient's history, allowing easy subsetting.
+
+Currently, this repo include the following predictive models: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN, T-LSTM, GRU-Logistic Regression(GRU-LR), LR with embedding, plain LR, Random Forest to analyze and predict clinical performaces. 
+
 
 **Folder Organization**
 * ehr_pytorch: main folder with modularized components:
@@ -31,9 +33,9 @@ In order to predict the current and future states of patients, we have built mul
     * hf.trainEHRmodel.pth: actual trained model
     * hf.trainEHRmodel.st: state dictionary
 
-**Data Description**
+**Data Structure**
 
-*  Cerner: derived from > 600 Cerner implementation throughout the United States; contains clinical information for over 50 million unique patients with > 10 years of records. In total there are more than 110 million patient visits (encounters), 15815 unique medical codes. Encounters may include pharmacy, clinical and microbiology laboratory, admission, and billing information from affiliated patient care locations. All admissions, medication orders and dispensing, laboratory orders, and specimens are date and time stamped, providing a temporal relationship between treatment patterns and clinical information.These clinical data are mapped to the most common standards, for example, diagnoses and procedures are mapped to the International Classification of Diseases (ICD) codes, medimultications information include the national drug codes (NDCs), and laboratory tests are linked to their LOINIC codes.
+*  We followed the data structure used in the RETAIN. Encounters may include pharmacy, clinical and microbiology laboratory, admission, and billing information from affiliated patient care locations. All admissions, medication orders and dispensing, laboratory orders, and specimens are date and time stamped, providing a temporal relationship between treatment patterns and clinical information.These clinical data are mapped to the most common standards, for example, diagnoses and procedures are mapped to the International Classification of Diseases (ICD) codes, medimultications information include the national drug codes (NDCs), and laboratory tests are linked to their LOINIC codes.
 
 
 *  Our processed pickle data: multi-level lists. From most outmost to gradually inside (assume we have loaded them as X)
