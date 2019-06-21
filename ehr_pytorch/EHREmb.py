@@ -3,7 +3,7 @@ This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
 
 @authors: Lrasmy , Jzhu @ DeguiZhi Lab - UTHealth SBMI
-Last revised June 2nd 2019
+Last revised June 21st 2019
 
 """
 
@@ -14,14 +14,16 @@ from torch.autograd import Variable
 import torch.nn.functional as F 
 use_cuda = torch.cuda.is_available()
 
-#construct a whole embedding class from pytorch nn.module
-#then we call this class in models after we define it 
+# Construct a whole embedding class from pytorch nn.module
+# Then we call this class in models after we define it 
+
 class EHREmbeddings(nn.Module):
-    #initialization and then the forward and things
-    #DRNN has no bi, QRNN no bi, TLSTM has no bi, but DRNN has other cell-types 
-    #cel_type are different for each model variation 
+    # Initialization and then the forward the embedding
+    # DRNN has no bi, QRNN no bi, TLSTM has no bi, but DRNN has other cell-types 
+    # cel_type are different for each model variation 
     def __init__(self, input_size, embed_dim ,hidden_size, n_layers=1,dropout_r=0.1,cell_type='LSTM', bii=False, time=False , preTrainEmb='', packPadMode = True):
         super(EHREmbeddings, self).__init__()
+        # Initialize the hyperparmeters
         self.embed_dim = embed_dim
         self.hidden_size = hidden_size
         self.n_layers = n_layers
@@ -35,16 +37,18 @@ class EHREmbeddings(nn.Module):
         else: 
             self.bi=1
             
+        # Initialize the single embedding 
         if len(input_size)==1:
             self.multi_emb=False
             if len(self.preTrainEmb)>0:
                 emb_t= torch.FloatTensor(np.asmatrix(self.preTrainEmb))
                 self.embed= nn.Embedding.from_pretrained(emb_t)#,freeze=False) 
-                self.in_size= embed_dim ### need to be updated to be automatically capyured from the input
+                self.in_size= embed_dim ### need to be updated to be automatically captured from the input
             else:
                 input_size=input_size[0]
                 self.embed= nn.Embedding(input_size, self.embed_dim,padding_idx=0)#,scale_grad_by_freq=True)
                 self.in_size= embed_dim
+        # Initialize the multi-embedding
         else:
             if len(input_size)!=3: raise ValueError('the input list either of 1 or 3 length')
             else: 
@@ -90,9 +94,9 @@ class EHREmbeddings(nn.Module):
         self.sigmoid = nn.Sigmoid()
       
                             
-    #let's define this class method
-    def EmbedPatients_MB(self,input): #let's define this
-    
+    # Construct the embedding without splitted inputs
+    def EmbedPatients_MB(self,input): 
+        # Check cuda availability
         if use_cuda:
             flt_typ=torch.cuda.FloatTensor
             lnt_typ=torch.cuda.LongTensor
@@ -103,7 +107,7 @@ class EHREmbeddings(nn.Module):
         mtd=[]
         lbt=[]
         seq_l=[]
-        self.bsize=len(input) ## no of pts in minibatch
+        self.bsize=len(input) ## number of patients in minibatch
         lp= len(max(input, key=lambda xmb: len(xmb[-1]))[-1]) ## maximum number of visits per patients in minibatch
         llv=0
         for x in input:
@@ -115,7 +119,7 @@ class EHREmbeddings(nn.Module):
             sk,label,ehr_seq_l = pt
             lpx=len(ehr_seq_l) ## no of visits in pt record
             seq_l.append(lpx) 
-            lbt.append(Variable(flt_typ([[float(label)]])))### check if code issue replace back to the above
+            lbt.append(Variable(flt_typ([[float(label)]])))
             ehr_seq_tl=[]
             time_dim=[]
             for ehr_seq in ehr_seq_l:
@@ -129,9 +133,9 @@ class EHREmbeddings(nn.Module):
             
             
             ehr_seq_t= Variable(torch.stack(ehr_seq_tl,0)) 
-            lpp= lp-lpx ## diff be max seq in minibatch and cnt of pt visits PLEASE MODIFY 
+            lpp= lp-lpx ## diffence between max seq in minibatch and cnt of patient visits 
             if self.packPadMode:
-                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise. Ginny Done!
+                zp= nn.ZeroPad2d((0,0,0,lpp)) ## (0,0,0,lpp) when use the pack padded seq and (0,0,lpp,0) otherwise. 
             else: 
                 zp= nn.ZeroPad2d((0,0,lpp,0))
             ehr_seq_t= zp(ehr_seq_t) ## zero pad the visits med codes
@@ -153,7 +157,7 @@ class EHREmbeddings(nn.Module):
             out_emb= torch.cat((embedded,mtd_t),dim=2)
         else:
             out_emb= embedded
-        return out_emb, lbt_t,seq_l #Always should return these3
+        return out_emb, lbt_t,seq_l #Always return these 3 variables
   
     def EmbedPatients_SMB(self,input): ## splitted input
     
@@ -167,7 +171,7 @@ class EHREmbeddings(nn.Module):
         lbt=[]
         seq_l=[]
         self.bsize=len(input) ## no of pts in minibatch
-        lp= len(max(input, key=lambda xmb: len(xmb[-1]))[-1]) ## maximum number of visits per patients in minibatch # this remains fine with whatever input format
+        lp= len(max(input, key=lambda xmb: len(xmb[-1]))[-1]) ## maximum number of visits per patients in minibatch 
     
         if self.diag==1: 
             mbd=[]
@@ -193,7 +197,7 @@ class EHREmbeddings(nn.Module):
     
         for pt in input:
             sk,label,ehr_seq_l = pt
-            lpx=len(ehr_seq_l) ## no of visits in pt record
+            lpx=len(ehr_seq_l) ## number of visits in patients record
             seq_l.append(lpx) 
             lbt.append(Variable(flt_typ([[float(label)]])))### check if code issue replace back to the above
             time_dim=[]        
