@@ -4,7 +4,7 @@
 This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
 @authors: Lrasmy , Jzhu  @ DeguiZhi Lab - UTHealth SBMI
-Last revised Jun 21 2019
+Last revised Jun 2 2019
 """
 from __future__ import print_function, division
 from io import open
@@ -94,6 +94,7 @@ def main():
     #parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     parser.add_argument('-optimizer', type=str, default='adam', choices=  ['adam','adadelta','adagrad', 'adamax', 'asgd','rmsprop', 'rprop', 'sgd'], 
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
+    #maybe later? choose the GPU working on 
     #parser.add_argument('-cuda', type= bool, default=True, help='whether GPU is available [default:True]')
     args = parser.parse_args()
     
@@ -183,18 +184,12 @@ def main():
                                   n_layers= args.n_layers,
                                   dropout_r=args.dropout_r, #default =0.1
                                   cell_type= 'TLSTM', #doesn't support normal cell types
-                                  bii= False, 
+                                  bii= False, #TLSTM do bi??? 
                                   time = args.time, 
                                   preTrainEmb= args.preTrainEmb)  
-    elif args.which_model == 'RETAIN': 
-        ehr_model = model.RETAIN(input_size= args.input_size, 
-                                  embed_dim=args.embed_dim, 
-                                  hidden_size= args.hidden_size,
-                                  n_layers= args.n_layers) 
     else: 
         ehr_model = model.EHR_LR_emb(input_size = args.input_size,
                                      embed_dim = args.embed_dim,
-                                     cell_type = 'LR',
                                      preTrainEmb= args.preTrainEmb)
     #make sure cuda is working
     if use_cuda:

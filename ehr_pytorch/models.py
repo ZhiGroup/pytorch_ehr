@@ -302,73 +302,41 @@ class EHR_TLSTM(EHREmbeddings):
 
 
 
-# Model 5: Logistic regression (with embeddings):
-class EHR_LR_emb(EHREmbeddings):
-    def __init__(self, input_size,embed_dim, time=False, cell_type= 'LR',preTrainEmb=''):
-        
-         EHREmbeddings.__init__(self,input_size, embed_dim ,cell_type = cell_type ,hidden_size = embed_dim)
-         
-    #embedding function goes here 
-    def EmbedPatient_MB(self, input):
-        return EHREmbeddings.EmbedPatients_MB(self, input)
-    
-    def EmbedPatient_SMB(self, input):
-        return EHREmbeddings.EmbedPatients_SMB(self, input)       
-    
-    def forward(self, input):
-        if self.multi_emb: 
-            x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
-        else: 
-            x_in , lt ,x_lens = self.EmbedPatient_MB(input) 
-        output = self.out(self.sigmoid(torch.sum(x_in,1)))
-        return output.squeeze(), lt.squeeze() 
-
-# Model 6:Retain Model
-class RETAIN(EHREmbeddings):
-    def __init__(self, input_size, embed_dim, hidden_size, n_layers):
-        
-        EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size)
-            
-        self.RNN1 = nn.RNN(embed_dim,hidden_size,1,batch_first=True,bidirectional=True)
-        self.RNN2 = nn.RNN(embed_dim,hidden_size,1,batch_first=True,bidirectional=True)
-        self.wa = nn.Linear(hidden_size*2,1,bias=False)
-        self.Wb = nn.Linear(hidden_size*2,hidden_size,bias=False)
-        self.W_out = nn.Linear(hidden_size,n_layers,bias=False)
+# Model 5: Logistic regression (with embeddings) Do we want to keep it here?  
+class EHR_LR_emb(nn.Module):
+    def __init__(self,input_size, embed_dim= 128, preTrainEmb= ''):    
+        super(EHR_LR_emb, self).__init__()
+        self.embed_dim = embed_dim
+        #self.embedding = nn.Embedding(input_size,embed_dim)
+        self.out = nn.Linear(self.embed_dim,1)
         self.sigmoid = nn.Sigmoid()
-        print("initialization done")
-        
-    def forward(self, inputs):
-        # get embedding using self.emb
-        b = len(inputs)
-        x_in,lt ,x_lens = self.EmbedPatients_MB(inputs)
-        h_0 = Variable(torch.rand(2,self.bsize, self.hidden_size))
-        
-        x_in = x_in.cuda()
-        h_0 = h_0.cuda()
-       
-        
-        # get alpha coefficients
-        outputs1 = self.RNN1(x_in,h_0) # [b x seq x 128*2]
-       
-        b,seq,_ = outputs1[0].shape
-        
-        E = self.wa(outputs1[0].contiguous().view(-1, self.hidden_size*2)) # [b*seq x 1]
-       
-        alpha = F.softmax(E.view(b,seq),1) # [b x seq]
-
+        self.preTrainEmb=preTrainEmb
+        #Need to modify here 
+        if len(self.preTrainEmb) >0 :
+           emb_t= torch.FloatTensor(np.asmatrix(self.preTrainEmb))
+           self.embed_dim = emb_t.size(1)
+           input_size = emb_t.size(0)
+           self.embedding = nn.EmbeddingBag(emb_t.size(0),emb_t.size(1))
+           self.embedding.weight.data= emb_t
+           self.embedding.weight.requires_grad=False
          
-        # get beta coefficients
-        outputs2 = self.RNN2(x_in,h_0) # [b x seq x 128]
-        b,seq,_ = outputs2[0].shape
-        outputs2 = self.Wb(outputs2[0].contiguous().view(-1,self.hidden_size*2)) # [b*seq x hid]
-        Beta = torch.tanh(outputs2).view(b, seq, self.hidden_size) # [b x seq x 128]
+        else:
+           self.embedding = nn.Embedding(input_size, self.embed_dim) 
+        
 
-        result = self.compute(x_in, Beta, alpha)
-        return result.squeeze(),lt.squeeze()
+    def forward(self, input):  
+        label, ehr_seq = input[0] 
+        #print(input[0]) #real-time check
+        label_tensor = Variable(torch.FloatTensor([[float(label)]]))
+        if use_cuda:
+            label_tensor = label_tensor.cuda()
+        if use_cuda:
+            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])).cuda() 
+        else:
+            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])) 
+        embedded = self.embedding(result).view(-1, self.embed_dim) #modified, instead of (-1,1, self.hidden_size) => use (-1,self.hidden_size)
+        embedded = torch.sum(embedded, dim=0).view(1,-1)#modified,instead of (1,1,-1) => use .view(1,-1) 
+        output = self.sigmoid(self.out(embedded))
+        
+        return output, label_tensor #return output and also label tensor 
 
-    # multiply to inputs
-    def compute(self, embedded, Beta, alpha):
-        b,seq,_ = embedded.size()
-        outputs = (embedded*Beta)*alpha.unsqueeze(2).expand(b,seq,self.hidden_size)
-        outputs = outputs.sum(1) # [b x hidden]
-        return self.sigmoid(self.W_out(outputs)) # [b x num_classes]
