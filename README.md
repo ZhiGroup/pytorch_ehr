@@ -11,7 +11,7 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
 
 **Pipeline**
 
-![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Pipeline.png)
+![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Pipeline%20for%20data%20flow.png)
 
 
 **Folder Organization**
