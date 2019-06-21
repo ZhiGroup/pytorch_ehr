@@ -51,7 +51,7 @@ Currently, this repo include the following predictive models: Vanilla RNN, GRU, 
 ![data example](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/data.png)
 Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
 *  Our Model to process the data is shown below:
-   ![model](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Model.png)
+![model](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Model.png)
 
 **Paper Reference**
 
