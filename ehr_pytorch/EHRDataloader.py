@@ -29,7 +29,7 @@ from torch.utils.data import Dataset, DataLoader
 
 # Dataset class loaded from pickles
 class EHRdataFromPickles(Dataset):
-    def __init__(self, root_dir, file = None, transform=None, sort = True, test_ratio = 0, valid_ratio = 0):
+    def __init__(self, root_dir, file = None, transform=None, sort = True, model='RNN', test_ratio = 0, valid_ratio = 0):
         """
         Args:
             1) root_dir (string): Path to pickled file(s).
@@ -141,39 +141,3 @@ class EHRdataloader(DataLoader):
         self.collate_fn = collate_fn
  
 ########END of main contents of EHRDataloader############
-
-'''
-############## Test codes for using EHRDataloader###############
-#######dataset preparation 
-#custom_data_check = EHRdataFromPickles(root_dir = '/data/projects/py_ehr_2/Data/', 
-                                        #file = 'hf50_cl2_h143_ref_t1.train') #modify to the datafolder if you want to use our samples 
-custom_data_check = EHRdataFromPickles(root_dir = '../data/', 
-                                        file = 'hf.train')
-print(custom_data_check.__len__())
-print(custom_data_check.__getitem__(-20, seeDescription = True))  
-
-loader = EHRdataloader(
-    custom_data_check
-)
-
-
-#######To use batches from dataloader: choose from the following:
-#1.give shuffled batches from loader using functions
-#loader = iter_batch2(loader, len(loader)) 
-#for i,batch in enumerate(loader):
-     #feed the batch
-#2. give ordered batches for next through loader
-#for i,batch in enumerate(loader):
-     #feed the batch
-     
-     
-#######data splits
-#custom_data_check2 = EHRdataFromPickles(root_dir = '/data/projects/py_ehr_2/Data/', 
-                                       #file = 'hf50_cl2_h143_ref_t1.train', test_ratio = 0.2, valid_ratio = 0.1)
-custom_data_check2 = EHRdataFromPickles(root_dir = '../data/', 
-                                        file = 'hf.train', test_ratio = 0.2, valid_ratio = 0.1)
-# print 
-train, test, valid = custom_data_check2.__splitdata__()
-print(train[0],test[0],valid[0])
-print(len(train), len(test), len(valid))
-'''
