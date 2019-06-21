@@ -60,31 +60,32 @@ class EHREmbeddings(nn.Module):
             self.in_size=(self.diag+self.med+self.oth)*self.embed_dim
        
         if self.time: self.in_size= self.in_size+1 
-               
-        if self.cell_type == "GRU":
-            self.cell = nn.GRU
-        elif self.cell_type == "RNN":
-            self.cell = nn.RNN
-        elif self.cell_type == "LSTM":
-            self.cell = nn.LSTM
-        elif self.cell_type == "QRNN":
-            from torchqrnn import QRNN
-            self.cell = QRNN
-        elif self.cell_type == "TLSTM":
-            from tplstm import TPLSTM
-            self.cell = TPLSTM 
-        else:
-            raise NotImplementedError
-       
-        if self.cell_type == "QRNN": 
-            self.bi=1 ### QRNN not support Bidirectional, DRNN should not be BiDirectional either.
-            self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers= self.n_layers, dropout= self.dropout_r)
-        elif self.cell_type == "TLSTM":
-            self.bi=1 
-            self.rnn_c = self.cell(self.in_size, hidden_size)
-        else:
-            self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers=self.n_layers, dropout= self.dropout_r, bidirectional=bii, batch_first=True)
-         
+        
+        if self.cell_type !='LR':    
+            if self.cell_type == "GRU":
+                self.cell = nn.GRU
+            elif self.cell_type == "RNN":
+                self.cell = nn.RNN
+            elif self.cell_type == "LSTM":
+                self.cell = nn.LSTM
+            elif self.cell_type == "QRNN":
+                from torchqrnn import QRNN
+                self.cell = QRNN
+            elif self.cell_type == "TLSTM":
+                from tplstm import TPLSTM
+                self.cell = TPLSTM 
+            else:
+                raise NotImplementedError
+
+            if self.cell_type == "QRNN": 
+                self.bi=1 ### QRNN not support Bidirectional, DRNN should not be BiDirectional either.
+                self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers= self.n_layers, dropout= self.dropout_r)
+            elif self.cell_type == "TLSTM":
+                self.bi=1 
+                self.rnn_c = self.cell(self.in_size, hidden_size)
+            else:
+                self.rnn_c = self.cell(self.in_size, self.hidden_size, num_layers=self.n_layers, dropout= self.dropout_r, bidirectional=bii, batch_first=True)
+
         self.out = nn.Linear(self.hidden_size*self.bi,1)
         self.sigmoid = nn.Sigmoid()
       
