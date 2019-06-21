@@ -76,7 +76,7 @@ class TPLSTM(nn.Module):
 
         c1 = torch.Tensor([1.0])
         c2 = torch.Tensor([2.7183])
-        
+        #print('t',t)       #print ('t abs',torch.abs(t*100))
         Ones = torch.ones([1,self.hidden_size])   
         if use_cuda:
             c1=c1.cuda()
