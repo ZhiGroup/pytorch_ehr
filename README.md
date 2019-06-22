@@ -11,15 +11,15 @@ Currently, this repo includes the following predictive models: Vanilla RNN, GRU,
 
 **Pipeline**
 
-![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Pipeline%20for%20data%20flow.png)
+![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/Pipeline%20for%20data%20flow.png)
 
 
 **Paper Reference**
-* The [paper](RNNisAllyouNeedv01.docx) upon which this repo was built. (to-do: include paper link)
+* The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/master/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. 
 
 
 **Folder Organization**
-* [ehr_pytorch](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/ehr_pytorch): main folder with modularized components:
+* [ehr_pytorch](https://github.com/ZhiGroup/pytorch_ehr/blob/master/ehr_pytorch): main folder with modularized components:
     * EHREmb.py: EHR embeddings
     * EHRDataloader.py: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding.
     * Models.py: multiple different models
@@ -55,7 +55,7 @@ Currently, this repo includes the following predictive models: Vanilla RNN, GRU,
     * 5th level: either a visit_time, or a single code
 *  An illustration of the data structure is shown below: 
 
-![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Data%20structure%20with%20explanation.png)
+![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/Data%20structure%20with%20explanation.png)
 
 In the implementation, the medical codes are tokenized with a unified dictionary for all patients.
 ![data example](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/data.png)
@@ -63,7 +63,7 @@ In the implementation, the medical codes are tokenized with a unified dictionary
 
 **Paper Reference**
 
-The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. 
+The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/master/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. 
 
 **Dependencies**
 * [Pytorch 0.4.0] (http://pytorch.org)
