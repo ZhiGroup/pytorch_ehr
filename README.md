@@ -50,9 +50,9 @@ Currently, this repo includes the following predictive models: Vanilla RNN, GRU,
         *  2nd element, e.g. X[0][2][0][1] is a list of codes corresponding to a single visit
     * 5th level: either a visit_time, or a single code
 *  An illustration of the data structure is shown below: 
-![data structure]
-Conceptual model of our data structure is as below:
-(https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Data%20structure%20with%20explanation.png)
+
+Conceptual model:
+![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Data%20structure%20with%20explanation.png)
 
 In the implementation, the medical codes are tokenized with a unified dictionary for all patients.
 ![data example](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/data.png)
