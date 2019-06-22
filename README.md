@@ -107,10 +107,10 @@ for i, batch in enumerate(loader):
 
 Check out this [notebook](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/RNN_tutorials_toy.ipynb) with a step by step guide of how to utilize our package. 
 
-**Authors**
+**Warning**
 
-* See the list of [Contributors](https://github.com/ZhiGroup/pytorch_ehr/graphs/contributors)
-* For development related requests, contact Degui.Zhi@uth.tmc.edu
+* This repo is for research purpose. Using it at your own risk. 
+* This repo is under GPL-v3 license. 
 
 **Acknowledgements**
 Hat-tip to:
