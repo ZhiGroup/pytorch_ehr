@@ -14,6 +14,10 @@ Currently, this repo includes the following predictive models: Vanilla RNN, GRU,
 ![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/Pipeline%20for%20data%20flow.png)
 
 
+**Paper Reference**
+* The [paper](RNNisAllyouNeedv01.docx) upon which this repo was built. (to-do: include paper link)
+
+
 **Folder Organization**
 * [ehr_pytorch](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/ehr_pytorch): main folder with modularized components:
     * EHREmb.py: EHR embeddings
