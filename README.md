@@ -1,4 +1,4 @@
-# Predictive Modeling in Electronic Health Records(EHR) using Pytorch
+# Predictive Modeling on Electronic Health Records(EHR) using Pytorch
 ***************** 
 
 **Overview**
