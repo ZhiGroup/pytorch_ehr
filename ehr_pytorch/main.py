@@ -4,7 +4,7 @@
 This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
 @authors: Lrasmy , Jzhu  @ DeguiZhi Lab - UTHealth SBMI
-Last revised Mar 25 2019
+Last revised Jun 2 2019
 """
 from __future__ import print_function, division
 from io import open
@@ -62,7 +62,7 @@ def main():
     parser.add_argument('-root_dir', type = str, default = '../data/' , help='the path to the folders with pickled file(s)')
     
     ### Kept original -files variable not forcing original unique naming for files
-    parser.add_argument('-files', type = list, default = ['hf.train'], help='''the list of name(s) of pickled file(s). 
+    parser.add_argument('-files', nargs='+', default = ['hf.train'], help='''the name(s) of pickled file(s), separtaed by space. so the argument will be saved as a list 
                         If list of 1: data will be first split into train, validation and test, then 3 dataloaders will be created.
                         If list of 3: 3 dataloaders will be created from 3 files directly. Please give files in this order: training, validation and test.''')
 
@@ -73,7 +73,7 @@ def main():
     parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}') #Do I want to keep LR here?#ask laila 
     parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only') #ask laila 
     ####Think about whether you want to keep this RNN or LR based, or just call all different models
-    parser.add_argument('-input_size', type = list, default =[15817], help='''input dimension(s), decide which embedding types to use. 
+    parser.add_argument('-input_size', nargs='+', type=int , default = [15817], help='''input dimension(s) separated in space the output will be a list, decide which embedding types to use. 
                         If len of 1, then  1 embedding; len of 3, embedding medical, diagnosis and others separately (3 embeddings) [default:[15817]]''')
     parser.add_argument('-embed_dim', type=int, default=128, help='number of embedding dimension [default: 128]')
     parser.add_argument('-hidden_size', type=int, default=128, help='size of hidden layers [default: 128]')
@@ -108,7 +108,8 @@ def main():
                               file = args.files[0], 
                               sort= False,
                               test_ratio = args.test_ratio, 
-                              valid_ratio = args.valid_ratio) #No sort before splitting
+                              valid_ratio = args.valid_ratio,
+                              model=args.which_model) #No sort before splitting
     
         # Dataloader splits
         train, test, valid = data.__splitdata__() #this time, sort is true
@@ -120,13 +121,16 @@ def main():
         print('3 files found. 3 dataloaders will be created for each')
         train = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[0], 
-                              sort= True)
+                              sort= True,
+                              model=args.which_model)
         valid = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[1], 
-                              sort= True)
+                              sort= True,
+                              model=args.which_model)
         test = EHRdataFromPickles(root_dir = args.root_dir, 
                               file = args.files[2], 
-                              sort= True)
+                              sort= True,
+                              model=args.which_model)
         print(colored("\nSee an example data structure from training data:", 'green'))
         print(train.__getitem__(40, seeDescription = True))
     
@@ -163,7 +167,7 @@ def main():
                                   time = args.time, 
                                   preTrainEmb= args.preTrainEmb)     
     elif args.which_model == 'QRNN': 
-        ehr_model = model.EHR_DRNN(input_size= args.input_size, 
+        ehr_model = model.EHR_QRNN(input_size= args.input_size, 
                                   embed_dim=args.embed_dim, 
                                   hidden_size= args.hidden_size,
                                   n_layers= args.n_layers,

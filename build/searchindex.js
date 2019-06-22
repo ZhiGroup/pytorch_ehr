@@ -1,1 +1,0 @@
-Search.setIndex({docnames:["Pytorch_EHR"],envversion:53,filenames:["Pytorch_EHR.rst"],objects:{},objnames:{},objtypes:{},terms:{index:0,modul:0,page:0,search:0},titles:["Welcome to pytorch_ehr\u2019s documentation!"],titleterms:{document:0,indic:0,pytorch_ehr:0,tabl:0,welcom:0}})
