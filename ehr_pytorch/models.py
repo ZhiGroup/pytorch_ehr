@@ -20,8 +20,8 @@ import torch.nn.functional as F
 from EHREmb import EHREmbeddings
 
 use_cuda = torch.cuda.is_available()
-##################TO DO: cell-type cleanup!
-#### For DRNN & QRNN: should always override self.bi ==1 (ASK)
+
+#### For DRNN & QRNN: should always override self.bi ==1
 
 # Model 1:RNN & Variations: GRU, LSTM, Bi-RNN, Bi-GRU, Bi-LSTM
 class EHR_RNN(EHREmbeddings):
@@ -50,7 +50,6 @@ class EHR_RNN(EHREmbeddings):
         return result
     
     def forward(self, input):
-        #print(type(input))
         if self.multi_emb:
             x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
         else: 
@@ -58,6 +57,7 @@ class EHR_RNN(EHREmbeddings):
         ### uncomment the below lines if you like to initiate hidden to random
         #h_0= self.init_hidden()
         #if use_cuda: h_0.cuda()
+
         if self.packPadMode: 
             x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)   
             output, hidden = self.rnn_c(x_inp)#,h_0) 
@@ -95,7 +95,9 @@ class EHR_DRNN(EHREmbeddings):
                 c = self.cell(self.hidden_size, self.hidden_size, dropout=self.dropout_r)
             self.layers.append(c)
         self.cells = nn.Sequential(*self.layers)
-        #check if DRNN can only be 1 directional, if that is the case then we always have self.bi = 1 
+
+        #check if DRNN can only be 1 directional,
+        # if that is the case then we always have self.bi = 1
         #self.out = nn.Linear(hidden_size,1)
 
     def EmbedPatient_MB(self, input):
@@ -203,11 +205,11 @@ class EHR_DRNN(EHREmbeddings):
         return dilated_inputs
     
     def init_hidden(self, batch_size, hidden_size):
-        c = Variable(torch.zeros(batch_size, hidden_size)) ############## hidden_dim??? hidden_size?? Also where is other batch_size 
+        c = Variable(torch.zeros(batch_size, hidden_size))
         if use_cuda:
             c = c.cuda()
         if self.cell_type == "LSTM":
-            m = Variable(torch.zeros(batch_size, hidden_size))  #batch_size should be part of self.batch_size I think 
+            m = Variable(torch.zeros(batch_size, hidden_size))
             if use_cuda:
                 m = m.cuda()
             return (c, m)
@@ -311,7 +313,7 @@ class EHR_LR_emb(nn.Module):
         self.out = nn.Linear(self.embed_dim,1)
         self.sigmoid = nn.Sigmoid()
         self.preTrainEmb=preTrainEmb
-        #Need to modify here 
+
         if len(self.preTrainEmb) >0 :
            emb_t= torch.FloatTensor(np.asmatrix(self.preTrainEmb))
            self.embed_dim = emb_t.size(1)
@@ -335,7 +337,7 @@ class EHR_LR_emb(nn.Module):
         else:
             result = Variable(torch.LongTensor([int(v) for v in ehr_seq])) 
         embedded = self.embedding(result).view(-1, self.embed_dim) #modified, instead of (-1,1, self.hidden_size) => use (-1,self.hidden_size)
-        embedded = torch.sum(embedded, dim=0).view(1,-1)#modified,instead of (1,1,-1) => use .view(1,-1) 
+        embedded = torch.sum(embedded, dim=0).view(1,-1)
         output = self.sigmoid(self.out(embedded))
         
         return output, label_tensor #return output and also label tensor 

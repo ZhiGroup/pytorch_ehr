@@ -184,5 +184,4 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, whi
     print(colored('BestValidAuc %f has a TestAuc of %f at epoch %d ' % (bestValidAuc, bestTestAuc, bestValidEpoch),'green'))
     print(colored('Details see ../models/%sEHRmodel.log' %(model_prefix + model_customed),'green'))
 
-    
-    
+

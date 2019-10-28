@@ -41,7 +41,7 @@ except:
 #models, utils, and Dataloader
 import models as model 
 #import EHRDataloader as dataloader
-from EHRDataloader import EHRdataFromPickles, EHRdataloader  #do modifications later
+from EHRDataloader import EHRdataFromPickles, EHRdataloader
 import utils as ut #:)))) 
 #from embedding import EHRembeddings
 from EHREmb import EHREmbeddings
@@ -70,7 +70,7 @@ def main():
     parser.add_argument('-valid_ratio', type = float, default = 0.1, help='validation data size [default: 0.1]')
     parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     #EHRmodel
-    parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}') #Do I want to keep LR here?#ask laila 
+    parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}')
     parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only') #ask laila 
     ####Think about whether you want to keep this RNN or LR based, or just call all different models
     parser.add_argument('-input_size', nargs='+', type=int , default = [15817], help='''input dimension(s) separated in space the output will be a list, decide which embedding types to use. 
@@ -94,7 +94,7 @@ def main():
     #parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     parser.add_argument('-optimizer', type=str, default='adam', choices=  ['adam','adadelta','adagrad', 'adamax', 'asgd','rmsprop', 'rprop', 'sgd'], 
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
-    #maybe later? choose the GPU working on 
+
     #parser.add_argument('-cuda', type= bool, default=True, help='whether GPU is available [default:True]')
     args = parser.parse_args()
     
@@ -250,7 +250,7 @@ def main():
                       model_prefix = args.model_prefix,
                       model_customed = args.model_customed)
 
-    #we can keyboard interupt now 
+    #you can keyboard interupt now
     except KeyboardInterrupt:
         print(colored('-' * 89, 'green'))
         print(colored('Exiting from training early','green'))

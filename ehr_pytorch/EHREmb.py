@@ -121,7 +121,7 @@ class EHREmbeddings(nn.Module):
                 pd=(0, (llv -len(ehr_seq[1])))
                 result = F.pad(torch.from_numpy(np.asarray(ehr_seq[1],dtype=int)).type(lnt_typ),pd,"constant", 0)
                 ehr_seq_tl.append(result)
-                if self.cell_type == 'TLSTM': #Ginny the correct implementation for TLSTM time
+                if self.cell_type == 'TLSTM': #the correct implementation for TLSTM time
                     time_dim.append(Variable(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ)))
                 elif self.time:                 
                     time_dim.append(Variable(torch.div(flt_typ([1.0]), torch.log(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ) + flt_typ([2.7183])))))
@@ -192,9 +192,9 @@ class EHREmbeddings(nn.Module):
     
         for pt in input:
             sk,label,ehr_seq_l = pt
-            lpx=len(ehr_seq_l) ## no of visits in pt record
+            lpx=len(ehr_seq_l) # no of visits in pt record
             seq_l.append(lpx) 
-            lbt.append(Variable(flt_typ([[float(label)]])))### check if code issue replace back to the above
+            lbt.append(Variable(flt_typ([[float(label)]]))) # check if code issue replace back to the above
             time_dim=[]        
             ehr_seq_tld=[]
             ehr_seq_tlm=[]
@@ -217,7 +217,7 @@ class EHREmbeddings(nn.Module):
                     else: resulto = F.pad(torch.from_numpy(np.asarray(ehr_seq[1][2],dtype=int)).type(lnt_typ),pdo,"constant", 0)
                     ehr_seq_tlo.append(resulto)
                 
-                if self.cell_type == 'TLSTM': #Ginny: correct implementation for TLSTM time
+                if self.cell_type == 'TLSTM': #correct implementation for TLSTM time
                     time_dim.append(Variable(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ)))
                 elif self.time:                 
                     time_dim.append(Variable(torch.div(flt_typ([1.0]), torch.log(torch.from_numpy(np.asarray(ehr_seq[0],dtype=int)).type(flt_typ) + flt_typ([2.7183])))))
@@ -268,7 +268,7 @@ class EHREmbeddings(nn.Module):
             if self.diag + self.med > 0 : embedded=torch.cat((embedded,embedded_o),dim=2)
             else: embedded=embedded_o 
     
-        #embedded=torch.cat((embedded_d,embedded_m,embedded_o),dim=2)## the concatination of above
+        #embedded=torch.cat((embedded_d,embedded_m,embedded_o),dim=2) ## the concatination of above
         
         lbt_t= Variable(torch.stack(lbt,0))
         if self.time:
