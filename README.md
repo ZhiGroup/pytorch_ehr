@@ -11,13 +11,13 @@ Currently, this repo includes the following predictive models: Vanilla RNN, GRU,
 
 **Pipeline**
 
-![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/Pipeline%20for%20data%20flow.png)
+![pipeline](tutorials/Pipeline%20for%20data%20flow.png)
 
 
 **Primary Results**
 
 
-![Results Summary](https://github.com/ZhiGroup/pytorch_ehr_internal/blob/Jan20_update/tutorials/image.png)
+![Results Summary](tutorials/image.png)
 
 Note this result is over two prediction tasks: Heart Failure (HF) risk and Readmission. We showed simple gated RNNs (GRUs or LSTMs) consistently beat traditional MLs (logistic regression (LR) and Random Forest (RF)). All methods were tuned by Bayesian Optimization. All these are described  in this [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/master/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf).  
 
@@ -30,14 +30,14 @@ Note this result is over two prediction tasks: Heart Failure (HF) risk and Readm
     * Utils.py
     * main.py: main execution file
     * tplstm.py: tplstm package file
-* Data
+* [Data](data)
     * toy.train: pickle file of  toy data with the same structure (multi-level lists) of our processed Cerner data, can be directly utilized for our models for demonstration purpose;
 * Preprocessing
-    * [data_preprocessing_v1.py](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/Preprocessing/data_preprocessing_v1.py): preprocess the data from dataset to build the required multi-level input structure
+    * [data_preprocessing_v1.py](Preprocessing/data_preprocessing_v1.py): preprocess the data from dataset to build the required multi-level input structure
       (clear description of how to run this file is in its document header)
-* [Tutorials](https://github.com/ZhiGroup/pytorch_ehr/tree/MasterUpdateJun2019/tutorials)
+* [Tutorials](tutorials)
     * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
-    * HF prediction for Diabetic Patients Pre and Post Diabetes.ipynb
+    * HF prediction for Diabetic Patients.ipynb
     * Early Readmission v2.ipynb
 * trained_models examples:
     * hf.trainEHRmodel.log: examples of the output of the model
@@ -116,7 +116,7 @@ for i, batch in enumerate(loader):
     #feed the batch to do things
 </pre>
 
-Check out this [notebook](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/RNN_tutorials_toy.ipynb) with a step by step guide of how to utilize our package. 
+Check out this [notebook](tutorials/RNN_tutorials_toy.ipynb) with a step by step guide of how to utilize our package. 
 
 **Warning**
 
