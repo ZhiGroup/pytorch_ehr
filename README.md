@@ -73,8 +73,8 @@ The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/master/Medinfo2019_PA_S
 This is Version 0.2, more details in the [release notes](https://github.com/ZhiGroup/pytorch_ehr/releases/tag/v0.2-Feb20)
 
 **Dependencies**
-* [Pytorch 0.4.0] (http://pytorch.org) All models except the QRNN and T-LSTM are compatble with the latest pytorch version (verified)
-* [Torchqrnn] (https://github.com/salesforce/pytorch-qrnn)
+* [Pytorch 0.4.0](http://pytorch.org) (All models except T-LSTM are compatible with pytorch version 1.4.0)
+* [Torchqrnn](https://github.com/salesforce/pytorch-qrnn)
 * Pynvrtc
 * sklearn
 * Matplotlib (for visualizations)
