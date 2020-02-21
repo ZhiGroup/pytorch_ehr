@@ -23,7 +23,7 @@ Note this result is over two prediction tasks: Heart Failure (HF) risk and Readm
 
 
 **Folder Organization**
-* [ehr_pytorch](https://github.com/ZhiGroup/pytorch_ehr/blob/master/ehr_pytorch): main folder with modularized components:
+* [ehr_pytorch](ehr_pytorch): main folder with modularized components:
     * EHREmb.py: EHR embeddings
     * EHRDataloader.py: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding.
     * Models.py: multiple different models
