@@ -2,26 +2,23 @@
 """
 This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
-@authors: Lrasmy , Jzhu, Htran @ DeguiZhi Lab - UTHealth SBMI
-Last revised Mar 25 2019
+@authors: Lrasmy , Jzhu, Htran, Xin128 @ DeguiZhi Lab - UTHealth SBMI
+Last revised Feb 20 2020
 """
 import numpy as np 
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-#from torch import optim
+from torch import optim
 import torch.nn.functional as F
-#from torchqrnn import QRNN
-#import bnlstm
+from torchqrnn import QRNN
 
 
-##### modify the name of module accordingly
+
 #from embedding import EHRembeddings 
 from EHREmb import EHREmbeddings
 
 use_cuda = torch.cuda.is_available()
-
-#### For DRNN & QRNN: should always override self.bi ==1
 
 # Model 1:RNN & Variations: GRU, LSTM, Bi-RNN, Bi-GRU, Bi-LSTM
 class EHR_RNN(EHREmbeddings):
@@ -32,12 +29,9 @@ class EHR_RNN(EHREmbeddings):
 
 
     #embedding function goes here 
-    def EmbedPatient_MB(self, input):
-        return EHREmbeddings.EmbedPatients_MB(self, input)
+    def EmbedPatient_MB(self, input, mtd):
+        return EHREmbeddings.EmbedPatients_MB(self, input, mtd)
     
-    def EmbedPatient_SMB(self, input):
-        return EHREmbeddings.EmbedPatients_SMB(self, input)       
-     
     def init_hidden(self):
         
         h_0 = Variable(torch.rand(self.n_layers*self.bi,self.bsize, self.hidden_size))
@@ -49,15 +43,11 @@ class EHR_RNN(EHREmbeddings):
             result = h_0
         return result
     
-    def forward(self, input):
-        if self.multi_emb:
-            x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
-        else: 
-            x_in , lt ,x_lens = self.EmbedPatient_MB(input) 
-        ### uncomment the below lines if you like to initiate hidden to random
+    def forward(self, input, x_lens, mtd):
+        x_in  = self.EmbedPatient_MB(input, mtd) 
+        ### uncomment the below lines if you like to initiate hidden to random instead of Zero which is the default
         #h_0= self.init_hidden()
         #if use_cuda: h_0.cuda()
-
         if self.packPadMode: 
             x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)   
             output, hidden = self.rnn_c(x_inp)#,h_0) 
@@ -70,7 +60,7 @@ class EHR_RNN(EHREmbeddings):
             output = self.sigmoid(self.out(torch.cat((hidden[-2],hidden[-1]),1)))
         else:
             output = self.sigmoid(self.out(hidden[-1]))
-        return output.squeeze(), lt.squeeze()
+        return output.squeeze()
 
 #Model 2: DRNN, DGRU, DLSTM
 class EHR_DRNN(EHREmbeddings): 
@@ -78,8 +68,6 @@ class EHR_DRNN(EHREmbeddings):
 
        	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=n_layers, dropout_r=dropout_r, cell_type=cell_type,bii=False, time=time , preTrainEmb=preTrainEmb, packPadMode=False)
 
-        #super(DRNN, self).__init__()
-        #The additional parameters that norma RNNs don't have
 
         self.dilations = [2 ** i for i in range(n_layers)]
         self.layers = nn.ModuleList([])
@@ -95,45 +83,35 @@ class EHR_DRNN(EHREmbeddings):
                 c = self.cell(self.hidden_size, self.hidden_size, dropout=self.dropout_r)
             self.layers.append(c)
         self.cells = nn.Sequential(*self.layers)
-
-        #check if DRNN can only be 1 directional,
-        # if that is the case then we always have self.bi = 1
         #self.out = nn.Linear(hidden_size,1)
-
-    def EmbedPatient_MB(self, input):
-        return EHREmbeddings.EmbedPatients_MB(self,input)
+    #embedding function goes here 
+    def EmbedPatient_MB(self, input, mtd):
+        return EHREmbeddings.EmbedPatients_MB(self, input, mtd)
+        
+## Uncomment if using the mutiple embeddings version ---not included in this release    
+#     def EmbedPatient_SMB(self, input,mtd):
+#         return EHREmbeddings.EmbedPatients_SMB(self, input,mtd)     
     
-    def EmbedPatient_SMB(self, input):
-        return EHREmbeddings.EmbedPatients_SMB(self,input)    
-    
-    def forward(self, inputs, hidden=None):
-        if self.multi_emb: 
-            x , lt ,_ = self.EmbedPatient_SMB(inputs)
-        else: 
-            x , lt ,_ = self.EmbedPatient_MB(inputs)
+    def forward(self, input,  x_lens, mtd, hidden=None):
+        x  = self.EmbedPatient_MB(input,mtd) 
 
         x=x.permute(1,0,2)
         outputs = []
         for i, (cell, dilation) in enumerate(zip(self.cells, self.dilations)):
             if hidden is None:
-                x,_ = self.drnn_layer(cell, x, dilation) ############## WE HAVE THE DRNN LAYER HERE. LET"S TRY THINGS. IN THE SAME CLASS WE DEFINE EHREMBEDDINGD
+                x,_ = self.drnn_layer(cell, x, dilation)
             else:
-                x,hidden[i] = self.drnn_layer(cell, x, dilation, hidden[i]) #######DRNN_LAYER YAAAAAAAAAAA
+                x,hidden[i] = self.drnn_layer(cell, x, dilation, hidden[i]) 
             
         outputs=x[-dilation:]
         x=self.sigmoid(self.out(torch.sum(outputs,0))) #change from F to self.sigmoid, should be the same
-        return x.squeeze(), lt.squeeze()
+        return x.squeeze()
 
         
 ######Dilated RNN related methods
     def drnn_layer(self, cell, inputs, rate, hidden=None):
-
-        #n_steps = len(inputs)
         n_steps = inputs.size(0)
-        #print('n_steps',n_steps) 
-        #batch_size = inputs[0].size(0)
         batch_size = inputs.size(1)
-        #print('batch size',batch_size) --verified correct
         hidden_size = cell.hidden_size
         #print('hidden size',hidden_size) --verified correct
 
@@ -148,7 +126,6 @@ class EHR_DRNN(EHREmbeddings):
 
         splitted_outputs = self._split_outputs(dilated_outputs, rate)
         outputs = self._unpad_outputs(splitted_outputs, n_steps)
-
         return outputs, hidden
        
     def _apply_cell(self, dilated_inputs, cell, batch_size, rate, hidden_size, hidden=None):
@@ -209,14 +186,12 @@ class EHR_DRNN(EHREmbeddings):
         if use_cuda:
             c = c.cuda()
         if self.cell_type == "LSTM":
-            m = Variable(torch.zeros(batch_size, hidden_size))
+            m = Variable(torch.zeros(batch_size, hidden_size))   
             if use_cuda:
                 m = m.cuda()
             return (c, m)
         else:
             return c        
-
-
 
 
 # Model 3: QRNN
@@ -234,19 +209,16 @@ class EHR_QRNN(EHREmbeddings):
         self.bi = 1 #enforcing 1 directional
         self.packPadMode = False #enforcing correct packpaddedmode
         
-    #embedding function goes here
-    def EmbedPatient_MB(self, input):
-        return EHREmbeddings.EmbedPatients_MB(self,input)
+    #embedding function goes here 
+    def EmbedPatient_MB(self, input, mtd):
+        return EHREmbeddings.EmbedPatients_MB(self, input, mtd)
     
-    def EmbedPatient_SMB(self, input):
-        return EHREmbeddings.EmbedPatients_SMB(self,input)    
-    
-    def forward(self, input):
-        x_in , lt ,x_lens = self.EmbedPatient_MB(input)
+    def forward(self, input, x_lens, mtd):    
+        x_in  = self.EmbedPatient_MB(input,mtd) 
         x_in = x_in.permute(1,0,2) ## QRNN not support batch first
         output, hidden = self.rnn_c(x_in)#,h_0) 
         output = self.sigmoid(self.out(hidden[-1]))
-        return output.squeeze(), lt.squeeze()
+        return output.squeeze()
 
 
 
@@ -256,11 +228,7 @@ class EHR_TLSTM(EHREmbeddings):
 
         EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers, dropout_r, cell_type, time , preTrainEmb)
        	EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size, n_layers=n_layers, dropout_r=dropout_r, cell_type=cell_type, bii=False, time=True , preTrainEmb=preTrainEmb, packPadMode=False)
-
-        #test on EHR_TLSTM() parameters please
-        #modify something here to make sure everything runs correctly
-        '''ask laila if i Implemented the right model parameters regarding, time, bii, and pretrained,
-        '''
+        
         if self.cell_type !='TLSTM' or self.bi != 1:
             print("TLSTM only supports Time aware LSTM cell type and 1 direction. Implementing corrected parameters instead")
         self.cell_type = 'TLSTM'
@@ -268,12 +236,12 @@ class EHR_TLSTM(EHREmbeddings):
         self.packPadMode = False
 
         
-        #check on the packpadded sequence part and others
-    def EmbedPatient_MB(self, input):
-        return EHREmbeddings.EmbedPatients_MB(self, input)
+    #embedding function goes here 
+    def EmbedPatient_MB(self, input, mtd):
+        return EHREmbeddings.EmbedPatients_MB(self, input, mtd)
     
-    def EmbedPatient_SMB(self, input):
-        return EHREmbeddings.EmbedPatients_SMB(self, input)       
+    def EmbedPatient_SMB(self, input,mtd):
+        return EHREmbeddings.EmbedPatients_SMB(self, input, mtd)   
 
   
     def init_hidden(self):
@@ -287,10 +255,9 @@ class EHR_TLSTM(EHREmbeddings):
         return result
    
     
-    def forward(self, input):
-        if self.multi_emb: x_in , lt ,x_lens = self.EmbedPatient_SMB(input)
-        else: x_in , lt ,x_lens = self.EmbedPatient_MB(input)
-        x_in = x_in.permute(1,0,2) ##
+    def forward(self, input, x_lens, mtd):
+        x_in  = self.EmbedPatient_MB(input,mtd) 
+        x_in = x_in.permute(1,0,2) 
         #x_inp = nn.utils.rnn.pack_padded_sequence(x_in,x_lens,batch_first=True)### not well tested
         h_0 = self.init_hidden()
         output, hidden,_ = self.rnn_c(x_in,h_0) 
@@ -300,45 +267,88 @@ class EHR_TLSTM(EHREmbeddings):
             output = self.sigmoid(self.out(torch.cat((hidden[-2],hidden[-1]),1)))
         else:
             output = self.sigmoid(self.out(hidden[-1]))
-        return output.squeeze(), lt.squeeze()
+        return output.squeeze()
 
-
-
-# Model 5: Logistic regression (with embeddings) Do we want to keep it here?  
-class EHR_LR_emb(nn.Module):
-    def __init__(self,input_size, embed_dim= 128, preTrainEmb= ''):    
-        super(EHR_LR_emb, self).__init__()
-        self.embed_dim = embed_dim
-        #self.embedding = nn.Embedding(input_size,embed_dim)
-        self.out = nn.Linear(self.embed_dim,1)
-        self.sigmoid = nn.Sigmoid()
-        self.preTrainEmb=preTrainEmb
-
-        if len(self.preTrainEmb) >0 :
-           emb_t= torch.FloatTensor(np.asmatrix(self.preTrainEmb))
-           self.embed_dim = emb_t.size(1)
-           input_size = emb_t.size(0)
-           self.embedding = nn.EmbeddingBag(emb_t.size(0),emb_t.size(1))
-           self.embedding.weight.data= emb_t
-           self.embedding.weight.requires_grad=False
+# Model 5: Logistic regression (with embeddings):
+class EHR_LR_emb(EHREmbeddings):
+    def __init__(self, input_size,embed_dim, time=False, cell_type= 'LR',preTrainEmb=''):
+        
+         EHREmbeddings.__init__(self,input_size, embed_dim ,hidden_size = embed_dim)
          
-        else:
-           self.embedding = nn.Embedding(input_size, self.embed_dim) 
+    #embedding function goes here 
+    def EmbedPatient_MB(self, input, mtd):
+        return EHREmbeddings.EmbedPatients_MB(self, input, mtd)
+## Uncomment if using the mutiple embeddings version ---not included in this release    
+#     def EmbedPatient_SMB(self, input,mtd):
+#         return EHREmbeddings.EmbedPatients_SMB(self, input,mtd)     
+    def forward(self, input, x_lens, mtd):
+#         if self.multi_emb:
+#             x_in  = self.EmbedPatient_SMB(input,mtd)
+#         else: 
+        x_in  = self.EmbedPatient_MB(input,mtd) 
+        output = self.sigmoid(self.out(torch.sum(x_in,1)))
+        return output.squeeze()
+
+
+# Model 6:Retain Model
+class RETAIN(EHREmbeddings):
+    def __init__(self, input_size, embed_dim, hidden_size, n_layers):
+        
+        EHREmbeddings.__init__(self,input_size = input_size, embed_dim=embed_dim ,hidden_size=hidden_size)
+        self.embed_dim = embed_dim
+        self.RNN1 = nn.RNN(embed_dim,hidden_size,1,batch_first=True,bidirectional=True)
+        self.RNN2 = nn.RNN(embed_dim,hidden_size,1,batch_first=True,bidirectional=True)
+        self.wa = nn.Linear(hidden_size*2,1,bias=False)
+        self.Wb = nn.Linear(hidden_size*2,hidden_size,bias=False)
+        self.W_out = nn.Linear(hidden_size,n_layers,bias=False)
+        self.sigmoid = nn.Sigmoid()
+        #embedding function goes here 
+    def EmbedPatient_MB(self, input, mtd):
+        return EHREmbeddings.EmbedPatients_MB(self, input, mtd)
+    
+    
+    def forward(self, input, x_lens, mtd):
+        # get embedding using self.emb
+        b = len(input)
+        x_in  = self.EmbedPatient_MB(input,mtd) 
+            
+        h_0 = Variable(torch.rand(2,self.bsize, self.hidden_size))
+        if use_cuda:
+            x_in = x_in.cuda()
+            h_0 = h_0.cuda()
+      
+        # get alpha coefficients
+        outputs1 = self.RNN1(x_in,h_0) # [b x seq x 128*2]
+        b,seq,_ = outputs1[0].shape
+        E = self.wa(outputs1[0].contiguous().view(-1, self.hidden_size*2)) # [b*seq x 1]     
+        alpha = F.softmax(E.view(b,seq),1) # [b x seq]
+        self.alpha = alpha
+         
+        # get beta coefficients
+        outputs2 = self.RNN2(x_in,h_0) # [b x seq x 128]
+        b,seq,_ = outputs2[0].shape
+        outputs2 = self.Wb(outputs2[0].contiguous().view(-1,self.hidden_size*2)) # [b*seq x hid]
+        self.Beta = torch.tanh(outputs2).view(b, seq, self.embed_dim) # [b x seq x 128]
+        result = self.compute(x_in, Beta, alpha)
+        return result.squeeze()
+
+    # multiply to inputs
+    def compute(self, embedded, Beta, alpha):
+        b,seq,_ = embedded.size()
+        outputs = (embedded*Beta)*alpha.unsqueeze(2).expand(b,seq,self.embed_dim)
+        outputs = outputs.sum(1) # [b x hidden]
+        return self.sigmoid(self.W_out(outputs)) # [b x num_classes]
+    
+    
+    # interpret
+    def interpret(self,u,v,i,o):
+        # u: user number, v: visit number, i: input element number, o: output sickness
+        a = self.alpha[u][v] # [1]
+        B = self.Beta[u][v] # [h] embed dim
+        W_emb = self.emb[i] # [h] embed)dim
+        W = self.W_out.weight.squeeze() # [h]
+        out = a*torch.dot(W,(B*W_emb))
+        return out
         
 
-    def forward(self, input):  
-        label, ehr_seq = input[0] 
-        #print(input[0]) #real-time check
-        label_tensor = Variable(torch.FloatTensor([[float(label)]]))
-        if use_cuda:
-            label_tensor = label_tensor.cuda()
-        if use_cuda:
-            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])).cuda() 
-        else:
-            result = Variable(torch.LongTensor([int(v) for v in ehr_seq])) 
-        embedded = self.embedding(result).view(-1, self.embed_dim) #modified, instead of (-1,1, self.hidden_size) => use (-1,self.hidden_size)
-        embedded = torch.sum(embedded, dim=0).view(1,-1)
-        output = self.sigmoid(self.out(embedded))
-        
-        return output, label_tensor #return output and also label tensor 
 

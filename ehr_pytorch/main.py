@@ -4,7 +4,7 @@
 This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
 @authors: Lrasmy , Jzhu  @ DeguiZhi Lab - UTHealth SBMI
-Last revised Jun 2 2019
+Last revised Feb 20 2020
 """
 from __future__ import print_function, division
 from io import open
@@ -18,32 +18,27 @@ import argparse
 import time
 import math
 
+from tqdm import tqdm
+
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch import optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
-
-#from sklearn.metrics import roc_auc_score  
-#from sklearn.metrics import roc_curve 
-
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+
 
 try:
     import cPickle as pickle
 except:
     import pickle
-    
-#import self-defined modules
-#models, utils, and Dataloader
+
 import models as model 
-#import EHRDataloader as dataloader
-from EHRDataloader import EHRdataFromPickles, EHRdataloader
+from EHRDataloader import EHRdataFromPickles, EHRdataloader  
 import utils as ut #:)))) 
-#from embedding import EHRembeddings
 from EHREmb import EHREmbeddings
 
 #silly ones
@@ -70,9 +65,12 @@ def main():
     parser.add_argument('-valid_ratio', type = float, default = 0.1, help='validation data size [default: 0.1]')
     parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
     #EHRmodel
-    parser.add_argument('-which_model', type = str, default = 'DRNN', help='choose from {"RNN","DRNN","QRNN","TLSTM","LR"}')
-    parser.add_argument('-cell_type', type = str, default = 'GRU', help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only') #ask laila 
-    ####Think about whether you want to keep this RNN or LR based, or just call all different models
+    parser.add_argument('-which_model', type = str, default = 'DRNN',choices= ['RNN','DRNN','QRNN','TLSTM','LR','RETAIN'], help='choose from {"RNN","DRNN","QRNN","TLSTM","LR","RETAIN"}') 
+<<<<<<< HEAD
+    parser.add_argument('-cell_type', type = str, default = 'GRU', choices=['RNN', 'GRU', 'LSTM'], help='For RNN based models, choose from {"RNN", "GRU", "LSTM"}) ## LR removed QRNN and TLSTM 11/6/19
+=======
+    parser.add_argument('-cell_type', type = str, default = 'GRU', choices=['RNN', 'GRU', 'LSTM'], help='For RNN based models, choose from {"RNN", "GRU", "LSTM", "QRNN" (for QRNN model only)}, "TLSTM (for TLSTM model only')
+>>>>>>> 6d09f621326c1379fb6a0d7e548e3c7bff452920
     parser.add_argument('-input_size', nargs='+', type=int , default = [15817], help='''input dimension(s) separated in space the output will be a list, decide which embedding types to use. 
                         If len of 1, then  1 embedding; len of 3, embedding medical, diagnosis and others separately (3 embeddings) [default:[15817]]''')
     parser.add_argument('-embed_dim', type=int, default=128, help='number of embedding dimension [default: 128]')
@@ -86,15 +84,13 @@ def main():
     parser.add_argument('-model_prefix', type = str, default = 'hf.train' , help='the prefix name for the saved model e.g: hf.train [default: [(training)file name]')
     parser.add_argument('-model_customed', type = str, default = '' , help='the 2nd customed specs of name for the saved model e.g: _RNN_GRU. [default: none]')
     # training 
-    parser.add_argument('-lr', type=float, default=10**-4, help='learning rate [default: 0.0001]')
+    parser.add_argument('-lr', type=float, default=10**-2, help='learning rate [default: 0.01]')
     parser.add_argument('-L2', type=float, default=10**-4, help='L2 regularization [default: 0.0001]')
     parser.add_argument('-eps', type=float, default=10**-8, help='term to improve numerical stability [default: 0.00000001]')
-    parser.add_argument('-epochs', type=int, default= 10, help='number of epochs for training [default: 100]')
-    parser.add_argument('-patience', type=int, default= 20, help='number of stagnant epochs to wait before terminating training [default: 20]')
-    #parser.add_argument('-batch_size', type=int, default=128, help='batch size for training, validation or test [default: 128]')
+    parser.add_argument('-epochs', type=int, default= 100, help='number of epochs for training [default: 100]')
+    parser.add_argument('-patience', type=int, default= 5, help='number of stagnant epochs to wait before terminating training [default: 5]')
     parser.add_argument('-optimizer', type=str, default='adam', choices=  ['adam','adadelta','adagrad', 'adamax', 'asgd','rmsprop', 'rprop', 'sgd'], 
                         help='Select which optimizer to train [default: adam]. Upper/lower case does not matter') 
-
     #parser.add_argument('-cuda', type= bool, default=True, help='whether GPU is available [default:True]')
     args = parser.parse_args()
     
@@ -116,6 +112,17 @@ def main():
         # can comment out this part if you dont want to know what's going on here
         print(colored("\nSee an example data structure from training data:", 'green'))
         print(data.__getitem__(35, seeDescription = True))
+    elif len(args.files) == 2:
+        print('2 files found. 2 dataloaders will be created for train and validation')
+        train = EHRdataFromPickles(root_dir = args.root_dir, 
+                              file = args.files[0], 
+                              sort= True,
+                              model=args.which_model)
+        valid = EHRdataFromPickles(root_dir = args.root_dir, 
+                              file = args.files[1], 
+                              sort= True,
+                              model=args.which_model)
+        test = None
         
     else:
         print('3 files found. 3 dataloaders will be created for each')
@@ -136,16 +143,15 @@ def main():
     
 
     print(colored("\nSample data lengths for train, validation and test:", 'green'))
-    print(train.__len__(), valid.__len__(), test.__len__())
-    
-    #separate loader for train, test, validation 
-    trainloader = EHRdataloader(train, batch_size = args.batch_size) 
-    validloader = EHRdataloader(valid, batch_size = args.batch_size)
-    testloader = EHRdataloader(test, batch_size = args.batch_size)
-
-    
+    if test:
+       print(train.__len__(), valid.__len__(), test.__len__())
+    else:
+        print(train.__len__(), valid.__len__())
+        print('No test file provided')
     
     #####Step2. Model loading
+    print (args.which_model ,' model initilaization')
+    
     if args.which_model == 'RNN': 
         ehr_model = model.EHR_RNN(input_size= args.input_size, 
                                   embed_dim=args.embed_dim, 
@@ -156,6 +162,7 @@ def main():
                                   bii= args.bii,
                                   time= args.time,
                                   preTrainEmb= args.preTrainEmb) 
+        pack_pad = True
     elif args.which_model == 'DRNN': 
         ehr_model = model.EHR_DRNN(input_size= args.input_size, 
                                   embed_dim=args.embed_dim, 
@@ -166,6 +173,7 @@ def main():
                                   bii= False,
                                   time = args.time, 
                                   preTrainEmb= args.preTrainEmb)     
+        pack_pad = False
     elif args.which_model == 'QRNN': 
         ehr_model = model.EHR_QRNN(input_size= args.input_size, 
                                   embed_dim=args.embed_dim, 
@@ -176,7 +184,7 @@ def main():
                                   bii= False, #QRNN doesn't support bi
                                   time = args.time,
                                   preTrainEmb= args.preTrainEmb)  
-        
+        pack_pad = False
     elif args.which_model == 'TLSTM': 
         ehr_model = model.EHR_TLSTM(input_size= args.input_size, 
                                   embed_dim=args.embed_dim, 
@@ -184,16 +192,40 @@ def main():
                                   n_layers= args.n_layers,
                                   dropout_r=args.dropout_r, #default =0.1
                                   cell_type= 'TLSTM', #doesn't support normal cell types
-                                  bii= False, #TLSTM do bi??? 
+                                  bii= False, 
                                   time = args.time, 
                                   preTrainEmb= args.preTrainEmb)  
+        pack_pad = False
+    elif args.which_model == 'RETAIN': 
+        ehr_model = model.RETAIN(input_size= args.input_size, 
+                                  embed_dim=args.embed_dim, 
+                                  hidden_size= args.hidden_size,
+                                  n_layers= args.n_layers) 
+        pack_pad = False
     else: 
         ehr_model = model.EHR_LR_emb(input_size = args.input_size,
                                      embed_dim = args.embed_dim,
                                      preTrainEmb= args.preTrainEmb)
-    #make sure cuda is working
+        pack_pad = False
+ 
+    #####Step3. call dataloader and create a list of minibatches
+   
+    # separate loader and minibatches for train, test, validation 
+    # Note: mbs stands for minibatches
+    print (' creating the list of training minibatches')
+    train_mbs = list(tqdm(EHRdataloader(train, batch_size = args.batch_size, packPadMode = pack_pad)))
+    print (' creating the list of valid minibatches')
+    valid_mbs = list(tqdm(EHRdataloader(valid, batch_size = args.batch_size, packPadMode = pack_pad)))
+    if test:
+        print (' creating the list of test minibatches')
+        test_mbs = list(tqdm(EHRdataloader(test, batch_size = args.batch_size, packPadMode = pack_pad)))
+    else:
+        test_mbs = None
+    
+    # make sure cuda is working
     if use_cuda:
         ehr_model = ehr_model.cuda() 
+        
     #model optimizers to choose from. Upper/lower case dont matter
     if args.optimizer.lower() == 'adam':
         optimizer = optim.Adam(ehr_model.parameters(), 
@@ -237,9 +269,9 @@ def main():
     #######Step3. Train, validation and test. default: batch shuffle = true 
     try:
         ut.epochs_run(args.epochs, 
-                      train = trainloader, 
-                      valid = validloader, 
-                      test = testloader, 
+                      train = train_mbs, 
+                      valid = valid_mbs, 
+                      test = test_mbs, 
                       model = ehr_model, 
                       optimizer = optimizer,
                       shuffle = True, 
@@ -250,7 +282,7 @@ def main():
                       model_prefix = args.model_prefix,
                       model_customed = args.model_customed)
 
-    #you can keyboard interupt now
+    #we can keyboard interupt now 
     except KeyboardInterrupt:
         print(colored('-' * 89, 'green'))
         print(colored('Exiting from training early','green'))

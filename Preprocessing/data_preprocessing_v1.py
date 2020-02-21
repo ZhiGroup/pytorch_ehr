@@ -66,13 +66,15 @@ if __name__ == '__main__':
    data_case = pd.read_table(caseFile)
    data_case.columns = ["Pt_id", "ICD", "Time"]
    data_case['Label'] = 1
-
+   #data_case=data_case[~data_case["ICD"].str.startswith('P')] ### use if you need to exclude certain type of codes
+    
 
    ## loading Control
    print('loading ctrls')
    data_control = pd.read_table(controlFile)
    data_control.columns = ["Pt_id", "ICD", "Time"]
    data_control['Label'] = 0
+   #data_control=data_control[~data_control["ICD"].str.startswith('P')] ### use if you need to exclude certain type of codes
    
   
    ### An example of sampling code: Control Sampling
