@@ -70,7 +70,7 @@ In the implementation, the medical codes are tokenized with a unified dictionary
 The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/master/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. 
 
 **Versions**
-This is Version 0.2, more details in the [release notes](/releases/tag/v0.2-Feb20)
+This is Version 0.2, more details in the [release notes](https://github.com/ZhiGroup/pytorch_ehr/releases/releases/tag/v0.2-Feb20)
 
 **Dependencies**
 * [Pytorch 0.4.0] (http://pytorch.org) All models except the QRNN and T-LSTM are compatble with the latest pytorch version (verified)
