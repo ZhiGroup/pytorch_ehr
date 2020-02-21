@@ -5,43 +5,36 @@
 This Class is mainly for the creation of the EHR patients' visits embedding
 which is the key input for all the deep learning models in this Repo
 @authors: Lrasmy , Jzhu @ DeguiZhi Lab - UTHealth SBMI
-Last revised Mar 25 2019
+Last revised Feb 20 2020
 """
 from __future__ import print_function, division
 from io import open
 #import string
 #import re
-#import random
+import random
 import math 
 import time 
 import os
 
 import torch
 import torch.nn as nn
-#from torch.autograd import Variable
-#from torch import optim
-#import torch.nn.functional as F
-#import torch.utils.data as Data
 from torch.utils.data import Dataset, DataLoader
 
 from sklearn.metrics import roc_auc_score  
 from sklearn.metrics import roc_curve 
 
 import matplotlib.pyplot as plt
-#import matplotlib.ticker as ticker
 import numpy as np
 
 #Rename afterwards
 import EHRDataloader
 from EHRDataloader import iter_batch2
-#silly ones
 from termcolor import colored
 
 
-#check this later
+
 use_cuda = torch.cuda.is_available()
-#device = torch.device("cuda:0" if use_cuda else "cpu")
-#cudnn.benchmark = True
+
 
 ###### minor functions, plots and prints
 #loss plot
@@ -77,65 +70,61 @@ def print2file(buf, outFile):
 
 
 ###### major model training utilities
-def trainsample(sample, model, optimizer, criterion = nn.BCELoss()): 
+def trainsample(sample, label_tensor, seq_l, mtd, model, optimizer, criterion = nn.BCELoss()): 
+    model.train() ## LR added Jul 10, that is the right implementation
     model.zero_grad()
-    output, label_tensor = model(sample)   
+    output = model(sample,seq_l, mtd)   
     loss = criterion(output, label_tensor)    
     loss.backward()   
     optimizer.step()
-    #print(loss.item())
+    # print(loss.item())
     return output, loss.item()
 
 
 #train with loaders
 
-def trainbatches(loader, model, optimizer, shuffle = True):#,we dont need this print print_every = 10, plot_every = 5): 
+def trainbatches(mbs_list, model, optimizer, shuffle = True):#,we dont need this print print_every = 10, plot_every = 5): 
     current_loss = 0
     all_losses =[]
     plot_every = 5
     n_iter = 0 
     if shuffle: 
-         #we shuffle batches if shuffle is true
-         loader = iter_batch2(loader, len(loader))
-    for i,batch in enumerate(loader):
-        #batch.to(device) #see if it works
-        output, loss = trainsample(batch, model, optimizer, criterion = nn.BCELoss())
+         # you can also shuffle batches using iter_batch2 method in EHRDataloader
+        #  loader = iter_batch2(mbs_list, len(mbs_list))
+        random.shuffle(mbs_list)
+    for i,batch in enumerate(mbs_list):
+        sample, label_tensor, seq_l, mtd = batch
+        output, loss = trainsample(sample, label_tensor, seq_l, mtd, model, optimizer, criterion = nn.BCELoss())
         current_loss += loss
         n_iter +=1
     
         if n_iter % plot_every == 0:
             all_losses.append(current_loss/plot_every)
             current_loss = 0    
-        #print(all_losses) #check    
     return current_loss, all_losses 
 
 
 
-def calculate_auc(model, loader, which_model = 'RNN', shuffle = True): # batch_size= 128 not needed
-
+def calculate_auc(model, mbs_list, which_model = 'RNN', shuffle = True): # batch_size= 128 not needed
+    model.eval() ## LR added Jul 10, that is the right implementation
     y_real =[]
     y_hat= []
     if shuffle: 
-         loader = iter_batch2(loader, len(loader)) 
-    for i,batch in enumerate(loader):
-            #batch.to(device) #check you want it or not 
-            output, label_tensor = model(batch)
-            if which_model != 'LR':
-                y_hat.extend(output.cpu().data.view(-1).numpy())  
-                y_real.extend(label_tensor.cpu().data.view(-1).numpy())
+        random.shuffle(mbs_list)
+    for i,batch in enumerate(mbs_list):
+
+        sample, label_tensor, seq_l, mtd = batch
+        output = model(sample, seq_l, mtd)
+        y_hat.extend(output.cpu().data.view(-1).numpy())  
+        y_real.extend(label_tensor.cpu().data.view(-1).numpy())
          
-            else: 
-                #The minor case, basically embedding LR and GRU-LR case. Do we want to keep it?
-                y_hat.append(output.cpu().data.numpy()[0][0])
-                y_real.append(label_tensor.cpu().data.numpy()[0][0])
-    
     auc = roc_auc_score(y_real, y_hat)
     return auc, y_real, y_hat 
 
     
 #define the final epochs running, use the different names
 
-def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, which_model = 'RNN', patience = 20, output_dir = '../models/', model_prefix = 'hf.train', model_customed= ''):  
+def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, which_model = 'RNN', patience = 20, output_dir = '../models/', model_prefix = 'dhf.train', model_customed= ''):  
     bestValidAuc = 0.0
     bestTestAuc = 0.0
     bestValidEpoch = 0
@@ -144,26 +133,31 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, whi
     #print2file(header, logFile)
     for ep in range(epochs):
         start = time.time()
-        current_loss, train_loss = trainbatches(loader = train, model= model, optimizer = optimizer)
+        current_loss, train_loss = trainbatches(mbs_list = train, model= model, optimizer = optimizer)
 
         train_time = timeSince(start)
         #epoch_loss.append(train_loss)
         avg_loss = np.mean(train_loss)
-        train_auc, _, _ = calculate_auc(model = model, loader = train, which_model = which_model, shuffle = shuffle)
         valid_start = time.time()
-        valid_auc, _, _ = calculate_auc(model = model, loader = valid, which_model = which_model, shuffle = shuffle)
+        train_auc, _, _ = calculate_auc(model = model, mbs_list = train, which_model = which_model, shuffle = shuffle)
+        valid_auc, _, _ = calculate_auc(model = model, mbs_list = valid, which_model = which_model, shuffle = shuffle)
         valid_time = timeSince(valid_start)
-        print(colored('\nCurrent running on Epoch (%s), Average_loss (%s)'%(ep, avg_loss), 'green'))
-        print(colored('Train_auc (%s), Valid_auc (%s)'%(train_auc, valid_auc),'green'))
-        print(colored('Train_time (%s), Valid_time (%s)'%(train_time, valid_time),'green'))
+        print(colored('\n Epoch (%s): Train_auc (%s), Valid_auc (%s) ,Training Average_loss (%s), Train_time (%s), Eval_time (%s)'%(ep, train_auc, valid_auc , avg_loss,train_time, valid_time), 'green'))
         if valid_auc > bestValidAuc: 
               bestValidAuc = valid_auc
               bestValidEpoch = ep
-              best_model= model          
+              best_model= model 
+              if test:      
+                      testeval_start = time.time()
+                      bestTestAuc, _, _ = calculate_auc(model = best_model, mbs_list = test, which_model = which_model, shuffle = shuffle)
+                      print(colored('\n Test_AUC (%s) , Test_eval_time (%s) '%(bestTestAuc, timeSince(testeval_start)), 'yellow')) 
+                      #print(best_model,model) ## to verify that the hyperparameters already impacting the model definition
+                      #print(optimizer)
         if ep - bestValidEpoch > patience:
               break
-          
-    bestTestAuc, _, _ = calculate_auc(model = best_model, loader = test, which_model = which_model, shuffle = shuffle)
+    #if test:      
+    #   bestTestAuc, _, _ = calculate_auc(model = best_model, mbs_list = test, which_model = which_model, shuffle = shuffle) ## LR code reorder Jul 10
+    
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     #save model & parameters
@@ -175,13 +169,18 @@ def epochs_run(epochs, train, valid, test, model, optimizer, shuffle = True, whi
     best_model.load_state_dict(torch.load(args.output_dir + model_prefix + model_customed + 'EHRmodel.st'))
     best_model.eval()
     '''
-    #Record in the log file
+    #Record in the log file , modify below as you like, this is just as example
     header = 'BestValidAUC|TestAUC|atEpoch'
     logFile = output_dir + model_prefix + model_customed +'EHRmodel.log'
     print2file(header, logFile)
     pFile = '|%f |%f |%d ' % (bestValidAuc, bestTestAuc, bestValidEpoch)
     print2file(pFile, logFile) 
-    print(colored('BestValidAuc %f has a TestAuc of %f at epoch %d ' % (bestValidAuc, bestTestAuc, bestValidEpoch),'green'))
+    if test:
+        print(colored('BestValidAuc %f has a TestAuc of %f at epoch %d ' % (bestValidAuc, bestTestAuc, bestValidEpoch),'green'))
+    else: 
+        print(colored('BestValidAuc %f at epoch %d ' % (bestValidAuc,  bestValidEpoch),'green'))
+        print('No Test Accuracy')
     print(colored('Details see ../models/%sEHRmodel.log' %(model_prefix + model_customed),'green'))
 
-
+    
+    
