@@ -329,7 +329,7 @@ class RETAIN(EHREmbeddings):
         b,seq,_ = outputs2[0].shape
         outputs2 = self.Wb(outputs2[0].contiguous().view(-1,self.hidden_size*2)) # [b*seq x hid]
         self.Beta = torch.tanh(outputs2).view(b, seq, self.embed_dim) # [b x seq x 128]
-        result = self.compute(x_in, Beta, alpha)
+        result = self.compute(x_in, self.Beta, alpha)
         return result.squeeze()
 
     # multiply to inputs
