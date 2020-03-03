@@ -11,7 +11,7 @@
 #
 # Usage: feed this script with Case file and Control files each is just a three columns like pt_id | medical_code | visit_date and execute like:
 #
-# python data_preprocessing.py <Case File> <Control File> <types dictionary if available,otherwise use 'NA' to build new one> <output Files Prefix> 
+# python data_preprocessing_v1.py <Case File> <Control File> <types dictionary if available,otherwise use 'NA' to build new one> <output Files Prefix> 
 # you can optionally activate <case_samplesize> <control_samplesize> based on your cohort definition
 # This file will later split the data to training , validation and Test sets of ratio
 # Output files for Doctor AI or RETAIN
