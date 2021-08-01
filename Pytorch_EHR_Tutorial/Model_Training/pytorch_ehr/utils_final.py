@@ -926,9 +926,9 @@ def run_dl_model_surv(ehr_model,train_mbs,valid_mbs,tests_mbs,bmodel_pth,bmodel_
             torch.save(best_model, bmodel_pth)
             torch.save(best_model.state_dict(), bmodel_st)
         if ep - bestValidEpoch >patience: break
-    print( 'bestValidAuc %f at epoch %d ' % (bestValidAuc,  bestValidEpoch))
+    print( 'best Valid c-index %f at epoch %d ' % (bestValidAuc,  bestValidEpoch))
     if len(tests_mbs)>0:
-      print( 'Test AUCs are ' , bestTestAuc )
+      print( 'Test c-index are ' , bestTestAuc )
       return train_auc_allep,valid_auc_allep,test_auc_allep,y_real_f, y_hat_f
     else: return train_auc_allep,valid_auc
 
