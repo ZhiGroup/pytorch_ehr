@@ -8,16 +8,17 @@
 
    1. login to https://colab.research.google.com
    
-   2. Select the github option and enter this github repo link and select the ACM-BCB Branch 
-   ![image](https://user-images.githubusercontent.com/25290490/127570472-49819275-3657-40da-8d12-aaa85cd6f799.png)
+   2. Select the github option and enter this github repo link (https://github.com/ZhiGroup/pytorch_ehr) and select the ACM_BCB-Tutorial Branch 
    
-   3. click the arrow to open the prep_env notebook
+   ![image](https://user-images.githubusercontent.com/25290490/127776776-405f0dcc-2899-47d8-bbc7-31a2f21826c3.png)
+   
+   3. click the arrow to open the Prepare_env notebook
    
    4. Run file. It will display some messages, please Run anyway and follow the instructions to add the authorization code.
    
-   5. As it complete successfully, you can see :
+   5. As it complete successfully, you can see the pytorch_ehr drive created under your MyDrive:
    
-      ![image](https://user-images.githubusercontent.com/25290490/127571887-3560aa13-f3de-483c-bb71-5bfc20e08ff8.png)
+      ![image](https://user-images.githubusercontent.com/25290490/127777065-79c66fd4-a488-4b80-844d-0f0e29f93f72.png)
   
 
       Now you are ready to enjoy the tutorial :)
@@ -27,7 +28,8 @@
    1. Go to https://drive.google.com/, navigate to Data_Prep folder. You will find DataPrep.ipynb notebook which will guide you through the data extraction and preprocessing steps
 
 ### Model Training:
-   1. Go to https://drive.google.com/, navigate to Model_Training folder. You will find Model_Training.ipynb notebook which will guide you through the RNN model training and explanation
+   1. Go to https://drive.google.com/, navigate to Model_Training folder. You will find Model_Training.ipynb notebook which will guide you through the RNN model training 
+   2. Model_explanation.ipynb will be used for the model explanation demo. 
 
 
 
