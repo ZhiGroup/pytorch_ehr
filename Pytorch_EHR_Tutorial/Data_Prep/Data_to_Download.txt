@@ -1,0 +1,10 @@
+https://physionet.org/files/mimiciv/1.0/core/admissions.csv.gz
+https://physionet.org/files/mimiciv/1.0/core/transfers.csv.gz
+https://physionet.org/files/mimiciv/1.0/core/patients.csv.gz
+https://physionet.org/files/mimiciv/1.0/hosp/d_hcpcs.csv.gz
+https://physionet.org/files/mimiciv/1.0/icu/icustays.csv.gz
+https://physionet.org/files/mimiciv/1.0/hosp/diagnoses_icd.csv.gz
+https://physionet.org/files/mimiciv/1.0/hosp/d_icd_diagnoses.csv.gz
+https://physionet.org/files/mimiciv/1.0/hosp/procedures_icd.csv.gz
+https://physionet.org/files/mimiciv/1.0/hosp/d_icd_diagnoses.csv.gz
+https://physionet.org/files/mimiciv/1.0/hosp/d_icd_procedures.csv.gz

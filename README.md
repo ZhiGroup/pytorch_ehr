@@ -1,4 +1,37 @@
-# Predictive Modeling on Electronic Health Records(EHR) using Pytorch
+```diff
+@@ ## This Branch is dedicated to the ACM-BCB Tutorial ## @@
+```
+
+## Steps to run:
+
+### Environment Preparation:
+
+   1. login to https://colab.research.google.com
+   
+   2. Select the github option and enter this github repo link and select the ACM-BCB Branch 
+   ![image](https://user-images.githubusercontent.com/25290490/127570472-49819275-3657-40da-8d12-aaa85cd6f799.png)
+   
+   3. click the arrow to open the prep_env notebook
+   
+   4. Run file. It will display some messages, please Run anyway and follow the instructions to add the authorization code.
+   
+   5. As it complete successfully, you can see :
+   
+      ![image](https://user-images.githubusercontent.com/25290490/127571887-3560aa13-f3de-483c-bb71-5bfc20e08ff8.png)
+  
+
+      Now you are ready to enjoy the tutorial :)
+
+### Data Prepartion:
+
+   1. Go to https://drive.google.com/, navigate to Data_Prep folder. You will find DataPrep.ipynb notebook which will guide you through the data extraction and preprocessing steps
+
+### Model Training:
+   1. Go to https://drive.google.com/, navigate to Model_Training folder. You will find Model_Training.ipynb notebook which will guide you through the RNN model training and explanation
+
+
+
+## Predictive Modeling on Electronic Health Records(EHR) using Pytorch
 ***************** 
 
 **Overview**
@@ -11,38 +44,9 @@ Currently, this repo includes the following predictive models: Vanilla RNN, GRU,
 
 **Pipeline**
 
-![pipeline](tutorials/Pipeline%20for%20data%20flow.png)
+![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/Pipeline%20for%20data%20flow.png)
 
 
-**Primary Results**
-
-
-![Results Summary](tutorials/image.png)
-
-Note this result is over two prediction tasks: Heart Failure (HF) risk and Readmission. We showed simple gated RNNs (GRUs or LSTMs) consistently beat traditional MLs (logistic regression (LR) and Random Forest (RF)). All methods were tuned by Bayesian Optimization. All these are described  in this [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/master/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf).  
-
-
-**Folder Organization**
-* [ehr_pytorch](ehr_pytorch): main folder with modularized components:
-    * EHREmb.py: EHR embeddings
-    * EHRDataloader.py: a separate module to allow for creating batch preprocessed data with multiple functionalities including sorting on visit length and shuffle batches before feeding.
-    * Models.py: multiple different models
-    * Utils.py
-    * main.py: main execution file
-    * tplstm.py: tplstm package file
-* [Data](data)
-    * toy.train: pickle file of  toy data with the same structure (multi-level lists) of our processed Cerner data, can be directly utilized for our models for demonstration purpose;
-* Preprocessing
-    * [data_preprocessing_v1.py](Preprocessing/data_preprocessing_v1.py): preprocess the data from dataset to build the required multi-level input structure
-      (clear description of how to run this file is in its document header)
-* [Tutorials](tutorials)
-    * RNN_tutorials_toy.ipynb: jupyter notebooks with examples on how to run our models with visuals and/or utilize our dataloader as a standalone;
-    * HF prediction for Diabetic Patients.ipynb
-    * Early Readmission v2.ipynb
-* trained_models examples:
-    * hf.trainEHRmodel.log: examples of the output of the model
-    * hf.trainEHRmodel.pth: actual trained model
-    * hf.trainEHRmodel.st: state dictionary
 
 **Data Structure**
 
@@ -51,7 +55,7 @@ Note this result is over two prediction tasks: Heart Failure (HF) risk and Readm
 
 *  Our processed pickle data: multi-level lists. From most outmost to gradually inside (assume we have loaded them as X)
     * Outmost level: patients level, e.g. X[0] is the records for patient indexed 0
-    * 2nd level: patient information indicated in X[0][0], X[0][1], X[0][2] are patient id, disease status (1: yes, 0: no disease), and records
+    * 2nd level: patient information indicated in X[0][0], X[0][1], X[0][2] are patient id, disease status (1: yes, 0: no disease), in case of survival it will be [disease status , time_to_disease], and records
     * 3rd level: a list of length of total visits. Each element will be an element of two lists (as indicated in 4)
     * 4th level: for each row in the 3rd-level list. 
         *  1st element, e.g. X[0][2][0][0] is list of visit_time (since last time)
@@ -65,60 +69,28 @@ In the implementation, the medical codes are tokenized with a unified dictionary
 ![data example](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/data.png)
 * Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
 
+* How it works
+![image](https://user-images.githubusercontent.com/25290490/127748409-f2e20a7f-16d9-4c46-856f-9aec7da8b737.png)
+
 **Paper Reference**
 
 The [paper](https://github.com/ZhiGroup/pytorch_ehr/blob/master/Medinfo2019_PA_SimpleRNNisAllweNeed.pdf) upon which this repo was built. 
 
 **Versions**
-This is Version 0.2, more details in the [release notes](https://github.com/ZhiGroup/pytorch_ehr/releases/tag/v0.2-Feb20)
+This is towards Version 0.3, more details will be in the [release notes](https://github.com/ZhiGroup/pytorch_ehr_internal/releases/tag/v0.2-Feb20)
 
 **Dependencies**
-* [Pytorch 0.4.0](http://pytorch.org) (All models except T-LSTM are compatible with pytorch version 1.4.0) , <b> Issues appear with pytorch 1.5 solved in 1.6 version</b>
-* [Torchqrnn](https://github.com/salesforce/pytorch-qrnn)
+* [Pytorch 0.4.0] (http://pytorch.org) All models except the QRNN and T-LSTM are compatble with the latest pytorch version (verified)
+* [Torchqrnn] (https://github.com/salesforce/pytorch-qrnn)
 * Pynvrtc
 * sklearn
 * Matplotlib (for visualizations)
 * tqdm
 * Python: 3.6+
 
-**Usage**
-* For preprocessing
- python data_preprocessing.py <Case File> <Control File> <types dictionary if available,otherwise use 'NA' to build new one> <output Files Prefix> 
-The above case and control files each is just a three columns table like pt_id | medical_code | visit/event_date  
+ 
 
-* To run our models, directly use (you don't need to separately run dataloader, everything can be specified in args here):
-<pre>
-python3 main.py -root_dir<'your folder that contains data file(s)'> -files<['filename(train)' 'filename(valid)' 'filename(test)']> -which_model<'RNN'> -optimizer<'adam'> ....(feed as many args as you please)
-</pre>
-* Example:
-
-<pre>
-python3.7 main.py -root_dir /.../Data/ -files sample.train sample.valid sample.test -input_size 15800 -batch_size 100 -which_model LR -lr 0.01 -eps 1e-06 -L2 1e-04
-</pre>
-
-
-* To singly use our dataloader for generating data batches, use:
-<pre>
-data = EHRdataFromPickles(root_dir = '../data/', 
-                          file = ['toy.train'])
-loader =  EHRdataLoader(data, batch_size = 128)
-</pre>  
-  #Note: If you want to split data, you must specify the ratios in EHRdataFromPickles()
-         otherwise, call separate loaders for your seperate data files 
-         If you want to shuffle batches before using them, add this line 
- <pre>
-loader = iter_batch2(loader = loader, len(loader))
-</pre>
-otherwise, directly call 
-
-<pre>
-for i, batch in enumerate(loader): 
-    #feed the batch to do things
-</pre>
-
-Check out this [notebook](tutorials/RNN_tutorials_toy.ipynb) with a step by step guide of how to utilize our package. 
-
-**Warning**
+**License**
 
 * This repo is for research purpose. Using it at your own risk. 
 * This repo is under GPL-v3 license. 
