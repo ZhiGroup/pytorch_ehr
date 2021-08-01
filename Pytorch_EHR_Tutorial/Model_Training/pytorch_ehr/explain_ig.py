@@ -70,7 +70,7 @@ def int_grad_pt(best_model , diag_t, code_desc, pt , m=64 , qc=False):
     if qc==True:
         with torch.no_grad():
             diff = f(x_in2, x_in) - f(x_in2/m, x_in)
-        print('gradient difference : ',diff, " , sum of contribution scores = ",code_visit_cont.sum())
+        print('output difference : ',diff, " , sum of contribution scores = ",code_visit_cont.sum())
     
     ### building DF for visualizations
     if use_cuda: 
@@ -133,7 +133,7 @@ def load_vocab_dict(type_File,desc_file):
 
 # In[7]:
 
-def calc_cont (model_pth,data_File,type_File,desc_file,task='NA'):
+def calc_contribution (model_pth,data_File,type_File,desc_file,task='NA',qc=True):
   if task == 'NA': multilbl=False
   else:  multilbl=True
   
@@ -142,7 +142,7 @@ def calc_cont (model_pth,data_File,type_File,desc_file,task='NA'):
   diag_t, code_desc = load_vocab_dict(type_File,desc_file)
   l_df=[]
   for i , pt in enumerate(mbs_list):
-    label, output_score , pt_inp_cont_1=int_grad_pt(best_model , diag_t, code_desc, pt , m=64 , qc=False)
+    label, output_score , pt_inp_cont_1=int_grad_pt(best_model , diag_t, code_desc, pt , m=64 , qc=qc)
     pt_inp_cont_1['PT']=i
     if task=='mort':
           pt_inp_cont_1['True_label']=label[:,:,0].squeeze().cpu().numpy()
