@@ -1,2 +1,0 @@
-cdm_source_name,cdm_source_abbreviation,cdm_holder,source_description,source_documentation_reference,cdm_etl_reference,source_release_date,cdm_release_date,cdm_version,vocabulary_version
-MIMIC IV,mimiciv,PhysioNet,"MIMIC-IV is a publicly available database of patients admitted to the Beth Israel Deaconess Medical Center in Boston, MA, USA.",https://mimic-iv.mit.edu/docs/,https://github.com/OHDSI/MIMIC/,2020-09-01,2021-05-03,5.3.1,v5.0 10-SEP-20
