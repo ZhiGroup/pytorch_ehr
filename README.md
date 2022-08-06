@@ -25,7 +25,12 @@
 
 ### Data Prepartion:
 
-   1. Go to https://drive.google.com/, navigate to Data_Prep folder. You will find DataPrep.ipynb notebook which will guide you through the data extraction and preprocessing steps
+This year, we will use sqlite to prepare our cohorts extracted from synthetic data
+
+
+   1. Download sqlite browser from https://sqlitebrowser.org/dl/
+   2. Under the rom the Data_Prep folder Download the dataprep.sql which describe the cohort definiation and data extraction from the covid100k.db adapted from  https://synthea.mitre.org/ covid-19 100K data set. 
+   3. You will also find DataPrep.ipynb notebook which will guide you through the data preprocessing.
 
 ### Model Training:
    1. Go to https://drive.google.com/, navigate to Model_Training folder. You will find Model_Training.ipynb notebook which will guide you through the RNN model training 
