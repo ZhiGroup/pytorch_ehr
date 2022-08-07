@@ -252,7 +252,8 @@ def trainbatches_outcomes(mbs_list, model,task, optimizer,shuffle = True, loss_f
             task_label_tensor=label_tensor[:,:,0:2] ### for mortality testing
         elif task=='vent_surv':
             task_label_tensor=label_tensor[:,:,2:4] ### for mortality testing
-        else: print (" task need to be one of ('mort','vent','readm','plos','mort_surv','vent_surv')")
+        else: #print (" task need to be one of ('mort','vent','readm','plos','mort_surv','vent_surv')")
+            task_label_tensor=label_tensor[:,:,0]
 
         output, loss = trainsample(sample, task_label_tensor, seq_l, mtd, model, optimizer, criterion = loss_fn)### LR amended Sep 30 2020 to make sure we can change the loss function for survival
         current_loss += loss
@@ -354,7 +355,8 @@ def calculate_auc_outcomes(model, mbs_list, task, which_model = 'RNN', mc=1): # 
             task_label_tensor=label_tensor[:,:,4] ### for readmision testing
         elif task=='plos':
             task_label_tensor=label_tensor[:,:,5] ### for prolonged LOS testing
-        else: print (" task need to be one of ('mort','vent','readm','plos')")
+        else: #print (" task need to be one of ('mort','vent','readm','plos')")
+            task_label_tensor=label_tensor[:,:,0]
 
         output = model(sample, seq_l, mtd)
    
@@ -555,7 +557,8 @@ def calculate_cindex_outcomes(model, mbs_list, task, which_model = 'RNN', shuffl
             task_label_tensor=label_tensor[:,:,0:2] ### for mortality testing
         elif task=='vent_surv':
             task_label_tensor=label_tensor[:,:,2:4] ### for mortality testing
-        else: print (" task need to be one of ('mort_surv','vent_surv')")
+        else: #print (" task need to be one of ('mort_surv','vent_surv')")
+            task_label_tensor=label_tensor[:,:,0:2]
 
         output = model(sample, seq_l, mtd)
         y_hat.extend(output.cpu().data.view(-1).numpy()*-1)  
@@ -859,6 +862,7 @@ def run_dl_model_surv(ehr_model,train_mbs,valid_mbs,tests_mbs,bmodel_pth,bmodel_
                  epochs=100 , l2=0.0001, lr = 0.1, eps = 1e-4, opt='Adagrad',patience=10 ):
     ## Data Loading
     if task: multiLbl=True
+    if task != 'vent_surv': task= 'mort_surv'
 
     w_model= wmodel
 
