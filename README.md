@@ -1,5 +1,5 @@
 ```diff
-@@ ## This Branch is dedicated to the ACM-BCB Tutorial ## @@
+@@ ## This Branch is dedicated to Tutorial using MIMIC-IV data ## @@
 ```
 
 ## Steps to run:
@@ -8,7 +8,7 @@
 
    1. login to https://colab.research.google.com
    
-   2. Select the github option and enter this github repo link (https://github.com/ZhiGroup/pytorch_ehr) and select the ACM_BCB-Tutorial Branch 
+   2. Select the github option and enter this github repo link (https://github.com/ZhiGroup/pytorch_ehr) and select the ***Tutorial_MIMIC*** Branch 
    
    ![image](https://user-images.githubusercontent.com/25290490/127776776-405f0dcc-2899-47d8-bbc7-31a2f21826c3.png)
    
