@@ -74,7 +74,7 @@ In the implementation, the medical codes are tokenized with a unified dictionary
 
 **Paper Reference**
 
-Since we started our pytorch_ehr project a number of papers are published, for version 3, you may need to cite our CovRNN study, an under review abstract is available [here](https://github.com/ZhiGroup/pytorch_ehr/blob/ACM_BCB-Tutorial/CovRNN_AMIA2021_podium_underReview.pdf) 
+Since we started our pytorch_ehr project a number of papers are published, for the latest version, you need to cite our [CovRNN study](https://www.thelancet.com/journals/landig/article/PIIS2589-7500(22)00049-8/fulltext)
 
 **Versions**
 This is towards Version 0.3, more details will be in the [release notes](https://github.com/ZhiGroup/pytorch_ehr_internal/releases/tag/v0.2-Feb20)
