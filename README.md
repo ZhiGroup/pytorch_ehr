@@ -9,8 +9,7 @@
    1. login to https://colab.research.google.com
    
    2. Select the github option and enter this github repo link (https://github.com/ZhiGroup/pytorch_ehr) and select the ***Tutorial_MIMIC*** Branch 
-   
-   ![image](https://user-images.githubusercontent.com/25290490/127776776-405f0dcc-2899-47d8-bbc7-31a2f21826c3.png)
+   ![image](https://user-images.githubusercontent.com/25290490/202850994-fcfad8fb-ed8e-4b19-ad88-dd158f899fdc.png)
    
    3. click the arrow to open the Prepare_env notebook
    
@@ -18,8 +17,7 @@
    
    5. As it complete successfully, you can see the pytorch_ehr drive created under your MyDrive:
    
-      ![image](https://user-images.githubusercontent.com/25290490/127777065-79c66fd4-a488-4b80-844d-0f0e29f93f72.png)
-  
+      ![image](https://user-images.githubusercontent.com/25290490/202851575-821744d8-f8bc-47d2-bf28-a4fb5651c5d0.png)  
 
       Now you are ready to enjoy the tutorial :)
 
