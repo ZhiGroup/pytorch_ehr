@@ -12,7 +12,7 @@ def dataframe_from_csv(path, compression='gzip', header=0, index_col=0):
 
 
 def read_patients_table(mimic4_path):
-    pats = dataframe_from_csv(os.path.join(mimic4_path, 'core/patients.csv.gz'))
+    pats = dataframe_from_csv(os.path.join(mimic4_path, 'hosp/patients.csv.gz'))
     pats = pats.reset_index()
     pats = pats[['subject_id', 'gender','dod','anchor_age','anchor_year']]
     pats['yob']= pats['anchor_year'] - pats['anchor_age']
@@ -22,9 +22,9 @@ def read_patients_table(mimic4_path):
 
 
 def read_admissions_table(mimic4_path):
-    admits = dataframe_from_csv(os.path.join(mimic4_path, 'core/admissions.csv.gz'))
+    admits = dataframe_from_csv(os.path.join(mimic4_path, 'hosp/admissions.csv.gz'))
     admits=admits.reset_index()
-    admits = admits[['subject_id', 'hadm_id', 'admittime', 'dischtime', 'deathtime', 'ethnicity']]
+    admits = admits[['subject_id', 'hadm_id', 'admittime', 'dischtime', 'deathtime', 'race']]
     admits.admittime = pd.to_datetime(admits.admittime)
     admits.dischtime = pd.to_datetime(admits.dischtime)
     admits.deathtime = pd.to_datetime(admits.deathtime)
