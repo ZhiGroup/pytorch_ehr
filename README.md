@@ -1,5 +1,5 @@
 ```diff
-@@ ## This Branch is dedicated to the ACM-BCB Tutorial ## @@
+@@ ## This Branch is dedicated to the IEEE ICHI 2023 Tutorial ## @@
 ```
 
 ## Steps to run:
