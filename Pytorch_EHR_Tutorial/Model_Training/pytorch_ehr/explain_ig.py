@@ -11,7 +11,7 @@ import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
 from tqdm import tqdm
-import pickle5 as pk
+import pickle as pk
 import pandas as pd
 import random
 use_cuda = torch.cuda.is_available()
