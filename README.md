@@ -1,5 +1,5 @@
 ```diff
-@@ ## This Branch is dedicated to the IEEE ICHI 2023 Tutorial ## @@
+@@ ## This Branch is dedicated for MRSA project led By Dr. Masayuki Nigo ## @@
 ```
 
 ## Steps to run:
