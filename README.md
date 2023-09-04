@@ -2,39 +2,10 @@
 @@ ## This Branch is dedicated for MRSA project led By Dr. Masayuki Nigo ## @@
 ```
 
-## Steps to run:
-
-### Environment Preparation:
-
-   1. login to https://colab.research.google.com
-   
-   2. Select the GitHub option and enter this GitHub repo link (https://github.com/ZhiGroup/pytorch_ehr) and select the ICHI_2023 Branch 
-   ![image](https://github.com/ZhiGroup/pytorch_ehr/assets/25290490/94281334-565c-4aa2-b0c7-8b00c7ce155e)
-
-   
-   3. click the arrow to open the Prepare_env notebook
-   
-   4. Run the file. It will display some messages, please Run anyway and follow the instructions to add the authorization code.
-   
-   5. As it completes successfully, you can see the pytorch_ehr drive created under your MyDrive:
-   
-      ![image](https://user-images.githubusercontent.com/25290490/127777065-79c66fd4-a488-4b80-844d-0f0e29f93f72.png)
-  
-
-      Now you are ready to enjoy the tutorial :)
 
 ### Data Preparation:
 
-This year, we have 2 options:
-
-1. Use the N3C SynthPuf data (only Demo, for code sharing on the N3C enclave Kindly email the presenters)
-2. We will use SQLite to prepare our cohorts extracted from 100K Covid-19 patients synthetic data (  Synthea(TM) COVID-19 data:     Walonoski J, Klaus S, Granger E, Hall D, Gregorowicz A, Neyarapally G, Watson A, Eastman J. Synthea™ Novel coronavirus (COVID-19) model and synthetic data set. Intelligence-Based Medicine. 2020 Nov;1:100007. https://doi.org/10.1016/j.ibmed.2020.100007 )
-
-   a. Download SQLite browser from https://sqlitebrowser.org/dl/
-   
-   b. Under the Data_Prep folder you can Download the dataprep.sql which describes the cohort definition and data extraction from the covid100k.db adapted from  https://synthea.mitre.org/ covid-19 100K data set.
-    
-   c. You will also find DataPrep.ipynb notebook which will guide you through the data preprocessing.
+For the MRSA Project  [more details will be added after paper publication]
 
 
 ### Model Training:
