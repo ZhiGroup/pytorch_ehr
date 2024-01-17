@@ -1,5 +1,5 @@
 ```diff
-@@ ## This Branch is dedicated to the IEEE ICHI 2023 Tutorial ## @@
+@@ ## This Branch is dedicated to Clinicians -- please feel free to report an issue to help making this Repo more user friendly ## @@
 ```
 
 ## Steps to run:
@@ -8,13 +8,13 @@
 
    1. login to https://colab.research.google.com
    
-   2. Select the GitHub option and enter this GitHub repo link (https://github.com/ZhiGroup/pytorch_ehr) and select the ICHI_2023 Branch 
+   2. Select the GitHub option and enter this GitHub repo link (https://github.com/ZhiGroup/pytorch_ehr) and select the "Clinician" Branch 
    ![image](https://github.com/ZhiGroup/pytorch_ehr/assets/25290490/94281334-565c-4aa2-b0c7-8b00c7ce155e)
 
    
    3. click the arrow to open the Prepare_env notebook
    
-   4. Run the file. It will display some messages, please Run anyway and follow the instructions to add the authorization code.
+   4. Run the file. It will display some messages; please select  "Run anyway" and follow the instructions to add the authorization code.
    
    5. As it completes successfully, you can see the pytorch_ehr drive created under your MyDrive:
    
