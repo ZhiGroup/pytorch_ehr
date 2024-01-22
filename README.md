@@ -29,7 +29,7 @@ This figure is the cumulative incidence curve of positive MRSA over two weeks in
 
 **Paper Reference**
 
-Please refer to our paper
+Please refer to our paper (under review)
 
 >**Deep Learning Model for Personalized Prediction of Positive MRSA Culture Using Time-Series Electronic Health Records**<br>Masayuki Nigo, Laila Rasmy, Bingyu Mao, Bijun Sai Kannadath, Ziqian Xie, Degui Zhi
 
