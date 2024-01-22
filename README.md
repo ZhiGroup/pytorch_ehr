@@ -1,88 +1,46 @@
-```diff
-@@ ## This Branch is dedicated for MRSA project led By Dr. Masayuki Nigo ## @@
-```
-
-
-### Data Preparation:
-
-For the MRSA Project  [more details will be added after paper publication]
-
-
-### Model Training:
-   1. Go to https://drive.google.com/, navigate to Model_Training folder. You will find Model_Training.ipynb notebook which will guide you through the RNN model training 
-   2. Model_explanation.ipynb will be used for the model explanation demo. 
-
-
-
-## Predictive Modeling on Electronic Health Records(EHR) using Pytorch
+## Personalized Prediction of Positive MRSA Culture Using Electronic Health Records(EHR)
 ***************** 
+
+This code repository provides the code to run the methicillin-resistant Staphylococcus aureus (MRSA) project that uses PyTorch_EHR, which leverages EHR time-series data, including wide-variety patient specific data, to predict MRSA culture positivity within two weeks.
 
 **Overview**
 
-Although there are plenty of repos on vision and NLP models, there are very limited repos on EHR using deep learning that we can find. Here we open source our repo, implementing data preprocessing, data loading, and a zoo of common RNN models. The main goal is to lower the bar of entering this field for researchers. We are not claiming any state-of-the-art performance, though our models are quite competitive.  
+MRSA poses significant morbidity and mortality in hospitals. Rapid, accurate risk stratification of MRSA is crucial for optimizing antibiotic therapy. Our study used PyTorch_EHR to predict MRSA culture positivity within two weeks. 8,164 MRSA and 22,393 non-MRSA patient events from Memorial Hermann Hospital System, Houston, Texas are used for model development.
 
-Based on existing works (e.g., Dr. AI and RETAIN), we represent electronic health records (EHRs) using the pickled list of list of list, which contain histories of patients' diagnoses, medications, and other various events. We integrated all relevant information of a patient's history, allowing easy subsetting.
+<img src="Schematic Structure.jpg"/> <be>
 
-Currently, this repo includes the following predictive models: Vanilla RNN, GRU, LSTM, Bidirectional RNN, Bidirectional GRU, Bidirectional LSTM, Dilated RNN, Dilated GRU, Dilated LSTM, QRNN,and T-LSTM to analyze and predict clinical performaces. Additionally we have tutorials comparing perfomance to plain LR, Random Forest. 
+This figure shows the schematic structure of the deep learning-based prediction model (PyTorch_EHR) for MRSA-positive cultures. Figure a summarizes the overall structure of the model used to predict MRSA-positive cultures over a two-week period from the index culture. Our model integrates multiple structural data tables from EHRs as time-sequenced data prior to the index time. PyTorch_EHR is employed to predict MRSA-positive cultures over two weeks from the index time. Figure b describes scenarios where patients experience multiple events over time. 
 
-**Pipeline**
+**Results**
 
-![pipeline](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/Pipeline%20for%20data%20flow.png)
+<img src="Results.jpg"/> <be>
 
+This figure is the cumulative incidence curve of positive MRSA over two weeks in the MHHS and MIMIC-IV Datasets. Figures a and b show the cumulative incidence of MRSA cultures in Memorial Hermann Hospital System (MHHS) and Medical Information Mart for Intensive Care (MIMIC)-IV datasets, respectively. Both figures were generated based on the risk predicted by our model in test datasets. Given the significant imbalance in the MIMIC-IV dataset, even high-risk patients achieved 20% positivity compared to the MHHS dataset. In contrast, the low-risk patient group had fewer false negatives. 
 
+**Steps to reproduce the model**
 
-**Data Structure**
+1. Data: We won't provide the original MHHS and MIMIC-IV datasets, you may acquire the MIMIC-IV data from [physionet.org](https://physionet.org/content/mimiciv/2.1/).
 
-*  We followed the data structure used in the RETAIN. Encounters may include pharmacy, clinical and microbiology laboratory, admission, and billing information from affiliated patient care locations. All admissions, medication orders and dispensing, laboratory orders, and specimens are date and time-stamped, providing a temporal relationship between treatment patterns and clinical information. These clinical data are mapped to the most common standards, for example, diagnoses and procedures are mapped to the International Classification of Diseases (ICD) codes, and laboratory tests are linked to their LOINIC codes.
+2. Data preprocessing: The file `Data_preprocessing_step1_mapping_20240121.ipynb` is the first step of the data preprocessing, which mainly focuses on mapping files for MHHS and MIMIC-IV datasets. Make sure files `mimic4_preprocess_util.py` and `preprocess_util.py` and under the same folder. The next step of data preprocessing is shown in the file `Data_preprocessing_step2_20240121.ipynb`, which takes the output .csv files from `Data_preprocessing_step1_mapping_20240121.ipynb` and prepares them as the suitable input format for the file `preprocess_outcomes.py`. Please refer to the below figure for more details about the data preprocess flow.
 
+<img src="Data preprocess flow.jpg"/> <be>
 
-*  Our processed pickle data: multi-level lists. From most outmost to gradually inside (assume we have loaded them as X)
-    * Outmost level: patients level, e.g. X[0] is the records for patient indexed 0
-    * 2nd level: patient information indicated in X[0][0], X[0][1], X[0][2] are patient id, outcome label or disease status (1: yes, 0: no disease), in case of survival it will be [disease status , time_to_disease], and visits records
-    * 3rd level: a list of length of total visits. Each element will be an element of two lists (as indicated in 4)
-    * 4th level: for each row in the 3rd-level list. 
-        *  1st element, e.g. X[0][2][0][0] is list of visit_time (since last time)
-        *  2nd element, e.g. X[0][2][0][1] is a list of codes corresponding to a single visit
-    * 5th level: either a visit_time, or a single code
-*  An illustration of the data structure is shown below: 
-
-![data structure](https://github.com/ZhiGroup/pytorch_ehr/blob/master/tutorials/Data%20structure%20with%20explanation.png)
-
-In the implementation, the medical codes are tokenized with a unified dictionary for all patients.
-![data example](https://github.com/ZhiGroup/pytorch_ehr/blob/MasterUpdateJun2019/tutorials/data.png)
-* Notes: as long as you have multi-level list you can use our EHRdataloader to generate batch data and feed them to your model
-
-* How it works
-![image](https://user-images.githubusercontent.com/25290490/127748409-f2e20a7f-16d9-4c46-856f-9aec7da8b737.png)
+3. Model training: After getting the output files from `preprocess_outcomes.py`, you may use them to run `Main_Training_20240121.ipynb`. Please also make sure the file `train_util.py` is under the same folder.
 
 **Paper Reference**
 
-Since we started our pytorch_ehr project a number of papers are published, for latest version kindly cite:
-Rasmy L, Nigo M, Kannadath BS, Xie Z, Mao B, Patel K, Zhou Y, Zhang W, Ross A, Xu H, Zhi D. Recurrent neural network models (CovRNN) for predicting outcomes of patients with COVID-19 on admission to hospital: model development and validation using electronic health record data. The Lancet Digital Health. 2022 Jun 1;4(6):e415-25
+Please refer to our paper (under review)
 
-**Versions**
-This is towards Version 0.3, more details will be in the [release notes](https://github.com/ZhiGroup/pytorch_ehr_internal/releases/tag/v0.2-Feb20)
+>**Deep Learning Model for Personalized Prediction of Positive MRSA Culture Using Time-Series Electronic Health Records**<br>Masayuki Nigo, Laila Rasmy, Bingyu Mao, Bijun Sai Kannadath, Ziqian Xie, Degui Zhi
+
+for more details.
 
 **Dependencies**
-* [Pytorch 0.4.0] (http://pytorch.org) All models except the QRNN and T-LSTM are compatble with the latest pytorch version (verified)
-* [Torchqrnn] (https://github.com/salesforce/pytorch-qrnn)
-* Pynvrtc
-* sklearn
-* Matplotlib (for visualizations)
-* tqdm
+
 * Python: 3.6+
-
+* Required Python packages can be installed using `pip install -r requirements.txt`.
  
-
 **License**
 
-* This repo is for research purpose. Using it at your own risk. 
+* This repo is for research purposes. Use it at your own risk. 
 * This repo is under GPL-v3 license. 
-
-**Acknowledgements**
-Hat-tip to:
-* [DRNN github](https://github.com/zalandoresearch/pt-dilate-rnn)
-* [QRNN github](https://github.com/salesforce/pytorch-qrnn)
-* [T-LSTM paper](http://biometrics.cse.msu.edu/Publications/MachineLearning/Baytasetal_PatientSubtypingViaTimeAwareLSTMNetworks.pdf)
-
-
