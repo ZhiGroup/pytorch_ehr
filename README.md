@@ -21,7 +21,7 @@ This figure is the cumulative incidence curve of positive MRSA over two weeks in
 
 1. Data: We won't provide the original MHHS and MIMIC-IV datasets, you may acquire the MIMIC-IV data from [physionet.org](https://physionet.org/content/mimiciv/2.1/).
 
-2. Data preprocessing: The file `Data_preprocessing_step1_mapping_20240121.ipynb` is the first step of the data preprocessing, which mainly focuses on mapping files for MHHS and MIMIC-IV datasets. Make sure files `mimic4_preprocess_util.py` and `preprocess_util.py` and under the same folder. The next step of data preprocessing is shown in the file `Data_preprocessing_step2_20240121.ipynb`, which takes the output cvs files from `Data_preprocessing_step1_mapping_20240121.ipynb` and prepares them as the suitable input format for the file `preprocess_outcomes.py`. Please refer to the below figure for more details about the data preprocess flow.
+2. Data preprocessing: The file `Data_preprocessing_step1_mapping_20240121.ipynb` is the first step of the data preprocessing, which mainly focuses on mapping files for MHHS and MIMIC-IV datasets. Make sure files `mimic4_preprocess_util.py` and `preprocess_util.py` and under the same folder. The next step of data preprocessing is shown in the file `Data_preprocessing_step2_20240121.ipynb`, which takes the output .csv files from `Data_preprocessing_step1_mapping_20240121.ipynb` and prepares them as the suitable input format for the file `preprocess_outcomes.py`. Please refer to the below figure for more details about the data preprocess flow.
 
 <img src="Data preprocess flow.jpg"/> <be>
 
