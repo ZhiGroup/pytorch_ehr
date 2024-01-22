@@ -1,5 +1,4 @@
-# Predictive Modeling on Electronic Health Records(EHR) using Pytorch
-***************** 
+# ![image](https://github.com/ZhiGroup/pytorch_ehr/assets/25290490/c2ac41bd-1e13-4243-8664-e9b2cf556bd6) : Predictive Modeling on Electronic Health Records(EHR) using Pytorch 
 
 **Overview**
 
